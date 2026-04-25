@@ -138,9 +138,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           : const Text('Material 2'),
       actions: !showMediumSizeLayout && !showLargeSizeLayout
           ? [
-              BrightnessButton(
-                handleBrightnessChange: widget.handleBrightnessChange,
-              ),
               // Material3Button(
               //   handleMaterialVersionChange: widget.handleMaterialVersionChange,
               // ),
@@ -149,11 +146,11 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
               //   colorSelected: widget.colorSelected,
               //   colorSelectionMethod: widget.colorSelectionMethod,
               // ),
-              ColorImageButton(
-                handleImageSelect: widget.handleImageSelect,
-                imageSelected: widget.imageSelected,
-                colorSelectionMethod: widget.colorSelectionMethod,
-              ),
+              // ColorImageButton(
+              //   handleImageSelect: widget.handleImageSelect,
+              //   imageSelected: widget.imageSelected,
+              //   colorSelectionMethod: widget.colorSelectionMethod,
+              // ),
             ]
           : [Container()],
     );
@@ -162,18 +159,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   Widget _trailingActions() => Column(
     mainAxisAlignment: MainAxisAlignment.end,
     children: [
-      Flexible(
-        child: BrightnessButton(
-          handleBrightnessChange: widget.handleBrightnessChange,
-          showTooltipBelow: false,
-        ),
-      ),
-      Flexible(
-        child: Material3Button(
-          handleMaterialVersionChange: widget.handleMaterialVersionChange,
-          showTooltipBelow: false,
-        ),
-      ),
       Flexible(
         child: ColorSeedButton(
           handleColorSelect: widget.handleColorSelect,
@@ -220,11 +205,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                 padding: const EdgeInsets.only(bottom: 20),
                 child: showLargeSizeLayout
                     ? ExpandedTrailingActions(
-                        useLightMode: widget.useLightMode,
-                        handleBrightnessChange: widget.handleBrightnessChange,
-                        useMaterial3: widget.useMaterial3,
-                        handleMaterialVersionChange:
-                            widget.handleMaterialVersionChange,
                         handleImageSelect: widget.handleImageSelect,
                         handleColorSelect: widget.handleColorSelect,
                         colorSelectionMethod: widget.colorSelectionMethod,
