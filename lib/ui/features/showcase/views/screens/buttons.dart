@@ -1,10 +1,6 @@
-// Copyright 2021 The Flutter team. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
 import 'package:flutter/material.dart';
 
-import 'constants.dart';
+import '../../../../core/constants/showcase_constants.dart';
 
 class BrightnessButton extends StatelessWidget {
   const BrightnessButton({
@@ -78,7 +74,7 @@ class ColorSeedButton extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       itemBuilder: (context) {
         return List.generate(ColorSeed.values.length, (index) {
-          ColorSeed currentColor = ColorSeed.values[index];
+          final currentColor = ColorSeed.values[index];
 
           return PopupMenuItem(
             value: index,

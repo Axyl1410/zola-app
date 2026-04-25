@@ -4,8 +4,9 @@
 
 import 'package:flutter/material.dart';
 
-import 'src/constants.dart';
-import 'src/home.dart';
+import 'ui/core/constants/showcase_constants.dart';
+import 'ui/features/showcase/views/home_view.dart';
+import 'ui/features/showcase/view_models/showcase_view_model.dart';
 
 void main() async {
   runApp(const App());
@@ -21,57 +22,37 @@ class App extends StatefulWidget {
 class _AppState extends State<App> {
   static const bool _useMaterial3 = true;
   static const ThemeMode _themeMode = ThemeMode.system;
-  ColorSeed _colorSelected = ColorSeed.baseColor;
-  ColorImageProvider _imageSelected = ColorImageProvider.leaves;
-  ColorScheme? _imageColorScheme = const ColorScheme.light();
-  ColorSelectionMethod _colorSelectionMethod = ColorSelectionMethod.colorSeed;
+  final ShowcaseViewModel _viewModel = ShowcaseViewModel();
 
-  void _handleColorSelect(int value) {
-    setState(() {
-      _colorSelectionMethod = ColorSelectionMethod.colorSeed;
-      _colorSelected = ColorSeed.values[value];
-    });
-  }
-
-  void _handleImageSelect(int value) {
-    final String url = ColorImageProvider.values[value].url;
-    ColorScheme.fromImageProvider(provider: NetworkImage(url)).then((
-      newScheme,
-    ) {
-      setState(() {
-        _colorSelectionMethod = ColorSelectionMethod.image;
-        _imageSelected = ColorImageProvider.values[value];
-        _imageColorScheme = newScheme;
-      });
-    });
+  @override
+  void dispose() {
+    _viewModel.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Material 3',
-      themeMode: _themeMode,
-      theme: _buildLightTheme(),
-      darkTheme: _buildDarkTheme(),
-      home: Home(
-        useMaterial3: _useMaterial3,
-        colorSelected: _colorSelected,
-        imageSelected: _imageSelected,
-        handleColorSelect: _handleColorSelect,
-        handleImageSelect: _handleImageSelect,
-        colorSelectionMethod: _colorSelectionMethod,
+    return ListenableBuilder(
+      listenable: _viewModel,
+      builder: (context, _) => MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Teamo',
+        themeMode: _themeMode,
+        theme: _buildLightTheme(),
+        darkTheme: _buildDarkTheme(),
+        home: Home(useMaterial3: _useMaterial3, viewModel: _viewModel),
       ),
     );
   }
 
   ThemeData _buildLightTheme() {
     return ThemeData(
-      colorSchemeSeed: _colorSelectionMethod == ColorSelectionMethod.colorSeed
-          ? _colorSelected.color
+      colorSchemeSeed:
+          _viewModel.colorSelectionMethod == ColorSelectionMethod.colorSeed
+          ? _viewModel.colorSelected.color
           : null,
-      colorScheme: _colorSelectionMethod == ColorSelectionMethod.image
-          ? _imageColorScheme
+      colorScheme: _viewModel.colorSelectionMethod == ColorSelectionMethod.image
+          ? _viewModel.imageColorScheme
           : null,
       useMaterial3: _useMaterial3,
       brightness: Brightness.light,
@@ -80,9 +61,10 @@ class _AppState extends State<App> {
 
   ThemeData _buildDarkTheme() {
     return ThemeData(
-      colorSchemeSeed: _colorSelectionMethod == ColorSelectionMethod.colorSeed
-          ? _colorSelected.color
-          : _imageColorScheme!.primary,
+      colorSchemeSeed:
+          _viewModel.colorSelectionMethod == ColorSelectionMethod.colorSeed
+          ? _viewModel.colorSelected.color
+          : _viewModel.imageColorScheme.primary,
       useMaterial3: _useMaterial3,
       brightness: Brightness.dark,
     );

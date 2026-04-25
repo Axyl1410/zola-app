@@ -1,12 +1,8 @@
-// Copyright 2021 The Flutter team. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
 import 'package:flutter/material.dart';
 
-import 'bar_transition.dart';
-import 'component_screen.dart';
-import 'rail_transition.dart';
+import 'screens/component_screen.dart';
+import 'transitions/bar_transition.dart';
+import 'transitions/rail_transition.dart';
 
 class NavigationTransition extends StatefulWidget {
   const NavigationTransition({
@@ -36,13 +32,10 @@ class _NavigationTransitionState extends State<NavigationTransition> {
   late final AnimationController controller;
   late final CurvedAnimation railAnimation;
   late final ReverseAnimation barAnimation;
-  bool controllerInitialized = false;
-  bool showDivider = false;
 
   @override
   void initState() {
     super.initState();
-
     controller = widget.animationController;
     railAnimation = widget.railAnimation;
 

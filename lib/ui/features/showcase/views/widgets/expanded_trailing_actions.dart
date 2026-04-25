@@ -1,10 +1,6 @@
-// Copyright 2021 The Flutter team. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
 import 'package:flutter/material.dart';
 
-import 'constants.dart';
+import '../../../../core/constants/showcase_constants.dart';
 import 'expanded_color_seed_action.dart';
 import 'expanded_image_color_action.dart';
 
@@ -20,7 +16,6 @@ class ExpandedTrailingActions extends StatelessWidget {
 
   final void Function(int) handleImageSelect;
   final void Function(int) handleColorSelect;
-
   final ColorImageProvider imageSelected;
   final ColorSeed colorSelected;
   final ColorSelectionMethod colorSelectionMethod;

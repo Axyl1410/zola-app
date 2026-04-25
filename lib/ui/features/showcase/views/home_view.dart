@@ -1,37 +1,21 @@
-// Copyright 2021 The Flutter team. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
 import 'package:flutter/material.dart';
 
-import 'buttons.dart';
-import 'color_palettes_screen.dart';
-import 'component_screen.dart';
-import 'constants.dart';
-import 'elevation_screen.dart';
-import 'expanded_trailing_actions.dart';
-import 'navigation_transition.dart';
-import 'one_two_transition.dart';
-import 'typography_screen.dart';
+import '../../../core/constants/showcase_constants.dart';
+import '../view_models/showcase_view_model.dart';
+import 'screens/buttons.dart';
+import 'screens/color_palettes_screen.dart';
+import 'screens/component_screen.dart';
+import 'screens/elevation_screen.dart';
+import 'screens/typography_screen.dart';
+import 'navigation_transition_view.dart';
+import 'one_two_transition_view.dart';
+import 'widgets/expanded_trailing_actions.dart';
 
 class Home extends StatefulWidget {
-  const Home({
-    super.key,
-    required this.useMaterial3,
-    required this.colorSelected,
-    required this.handleColorSelect,
-    required this.handleImageSelect,
-    required this.colorSelectionMethod,
-    required this.imageSelected,
-  });
+  const Home({super.key, required this.useMaterial3, required this.viewModel});
 
   final bool useMaterial3;
-  final ColorSeed colorSelected;
-  final ColorImageProvider imageSelected;
-  final ColorSelectionMethod colorSelectionMethod;
-
-  final void Function(int value) handleColorSelect;
-  final void Function(int value) handleImageSelect;
+  final ShowcaseViewModel viewModel;
 
   @override
   State<Home> createState() => _HomeState();
@@ -45,10 +29,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   bool showMediumSizeLayout = false;
   bool showLargeSizeLayout = false;
 
-  int screenIndex = ScreenSelected.component.value;
-
   @override
-  initState() {
+  void initState() {
     super.initState();
     controller = AnimationController(
       duration: Duration(milliseconds: transitionLength.toInt() * 2),
@@ -99,10 +81,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     }
   }
 
-  void handleScreenChanged(int screenSelected) {
-    screenIndex = screenSelected;
-  }
-
   Widget createScreenFor(
     ScreenSelected screenSelected,
     bool showNavBarExample,
@@ -139,16 +117,16 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     children: [
       Flexible(
         child: ColorSeedButton(
-          handleColorSelect: widget.handleColorSelect,
-          colorSelected: widget.colorSelected,
-          colorSelectionMethod: widget.colorSelectionMethod,
+          handleColorSelect: widget.viewModel.selectColor,
+          colorSelected: widget.viewModel.colorSelected,
+          colorSelectionMethod: widget.viewModel.colorSelectionMethod,
         ),
       ),
       Flexible(
         child: ColorImageButton(
-          handleImageSelect: widget.handleImageSelect,
-          imageSelected: widget.imageSelected,
-          colorSelectionMethod: widget.colorSelectionMethod,
+          handleImageSelect: widget.viewModel.selectImage,
+          imageSelected: widget.viewModel.imageSelected,
+          colorSelectionMethod: widget.viewModel.colorSelectionMethod,
         ),
       ),
     ],
@@ -157,7 +135,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: controller,
+      animation: Listenable.merge([controller, widget.viewModel]),
       builder: (context, child) {
         return NavigationTransition(
           scaffoldKey: scaffoldKey,
@@ -165,42 +143,32 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           railAnimation: railAnimation,
           appBar: _createAppBar(),
           body: createScreenFor(
-            ScreenSelected.values[screenIndex],
+            ScreenSelected.values[widget.viewModel.selectedScreenIndex],
             controller.value == 1,
           ),
           navigationRail: NavigationRail(
             extended: showLargeSizeLayout,
             destinations: _navRailDestinations,
-            selectedIndex: screenIndex,
-            onDestinationSelected: (index) {
-              setState(() {
-                screenIndex = index;
-                handleScreenChanged(screenIndex);
-              });
-            },
+            selectedIndex: widget.viewModel.selectedScreenIndex,
+            onDestinationSelected: widget.viewModel.selectScreen,
             trailing: Expanded(
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 20),
                 child: showLargeSizeLayout
                     ? ExpandedTrailingActions(
-                        handleImageSelect: widget.handleImageSelect,
-                        handleColorSelect: widget.handleColorSelect,
-                        colorSelectionMethod: widget.colorSelectionMethod,
-                        imageSelected: widget.imageSelected,
-                        colorSelected: widget.colorSelected,
+                        handleImageSelect: widget.viewModel.selectImage,
+                        handleColorSelect: widget.viewModel.selectColor,
+                        colorSelectionMethod: widget.viewModel.colorSelectionMethod,
+                        imageSelected: widget.viewModel.imageSelected,
+                        colorSelected: widget.viewModel.colorSelected,
                       )
                     : _trailingActions(),
               ),
             ),
           ),
           navigationBar: NavigationBars(
-            onSelectItem: (index) {
-              setState(() {
-                screenIndex = index;
-                handleScreenChanged(screenIndex);
-              });
-            },
-            selectedIndex: screenIndex,
+            onSelectItem: widget.viewModel.selectScreen,
+            selectedIndex: widget.viewModel.selectedScreenIndex,
             isExampleBar: false,
           ),
         );

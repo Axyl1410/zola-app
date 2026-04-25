@@ -1,11 +1,7 @@
-// Copyright 2021 The Flutter team. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
 import 'package:flutter/material.dart';
 
-import 'animations.dart';
-import 'constants.dart';
+import '../../../core/animations/showcase_animations.dart';
+import '../../../core/constants/showcase_constants.dart';
 
 class OneTwoTransition extends StatefulWidget {
   const OneTwoTransition({
@@ -47,7 +43,7 @@ class _OneTwoTransitionState extends State<OneTwoTransition> {
     return Row(
       children: <Widget>[
         Flexible(flex: mediumWidthBreakpoint.toInt(), child: widget.one),
-        if (widthAnimation.value.toInt() > 0) ...[
+        if (widthAnimation.value.toInt() > 0)
           Flexible(
             flex: widthAnimation.value.toInt(),
             child: FractionalTranslation(
@@ -55,7 +51,6 @@ class _OneTwoTransitionState extends State<OneTwoTransition> {
               child: widget.two,
             ),
           ),
-        ],
       ],
     );
   }

@@ -1,10 +1,6 @@
-// Copyright 2021 The Flutter team. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
 import 'package:flutter/widgets.dart';
 
-import 'animations.dart';
+import '../../../../core/animations/showcase_animations.dart';
 
 class RailTransition extends StatefulWidget {
   const RailTransition({
@@ -30,8 +26,6 @@ class _RailTransition extends State<RailTransition> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    // The animations are only rebuilt by this method when the text
-    // direction changes because this widget only depends on Directionality.
     final bool ltr = Directionality.of(context) == TextDirection.ltr;
 
     widthAnimation = Tween<double>(

@@ -1,7 +1,3 @@
-// Copyright 2021 The Flutter team. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
 import 'package:flutter/material.dart';
 
 class ElevationScreen extends StatelessWidget {
@@ -9,8 +5,8 @@ class ElevationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color shadowColor = Theme.of(context).colorScheme.shadow;
-    Color surfaceTint = Theme.of(context).colorScheme.primary;
+    final shadowColor = Theme.of(context).colorScheme.shadow;
+    final surfaceTint = Theme.of(context).colorScheme.primary;
     return Expanded(
       child: CustomScrollView(
         slivers: [
@@ -96,12 +92,11 @@ class ElevationGrid extends StatelessWidget {
               crossAxisCount: 3,
               children: elevationCards(shadowColor, surfaceTintColor),
             );
-          } else {
-            return SliverGrid.count(
-              crossAxisCount: 6,
-              children: elevationCards(shadowColor, surfaceTintColor),
-            );
           }
+          return SliverGrid.count(
+            crossAxisCount: 6,
+            children: elevationCards(shadowColor, surfaceTintColor),
+          );
         },
       ),
     );
@@ -135,8 +130,8 @@ class _ElevationCardState extends State<ElevationCard> {
 
   @override
   Widget build(BuildContext context) {
-    const BorderRadius borderRadius = BorderRadius.all(Radius.circular(4.0));
-    final Color color = Theme.of(context).colorScheme.surface;
+    const borderRadius = BorderRadius.all(Radius.circular(4.0));
+    final color = Theme.of(context).colorScheme.surface;
 
     return Padding(
       padding: const EdgeInsets.all(8.0),

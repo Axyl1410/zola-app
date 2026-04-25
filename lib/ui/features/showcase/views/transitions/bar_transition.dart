@@ -1,9 +1,6 @@
-// Copyright 2021 The Flutter team. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
 import 'package:flutter/widgets.dart';
 
-import 'animations.dart';
+import '../../../../core/animations/showcase_animations.dart';
 
 class BarTransition extends StatefulWidget {
   const BarTransition({

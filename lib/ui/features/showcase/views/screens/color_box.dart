@@ -1,7 +1,3 @@
-// Copyright 2024 The Flutter team. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -19,8 +15,10 @@ class ColorBox extends StatefulWidget {
 
   final String label;
   final String tone;
-  final Color color, onColor;
-  final double height, width;
+  final Color color;
+  final Color onColor;
+  final double height;
+  final double width;
   final bool displayPaletteInfo;
 
   @override
@@ -65,14 +63,11 @@ class _ColorBoxState extends State<ColorBox> {
                     icon: const Icon(Icons.copy, size: 24),
                     onPressed: () async {
                       final messenger = ScaffoldMessenger.of(context);
-                      // Copy color as hex to clipboard
                       final c = widget.color;
-
                       final hex =
                           '#${_colorChannelToHex(c.r)}'
                           '${_colorChannelToHex(c.g)}'
                           '${_colorChannelToHex(c.b)}';
-
                       final data = ClipboardData(text: hex);
                       await Clipboard.setData(data);
                       messenger.hideCurrentSnackBar();
