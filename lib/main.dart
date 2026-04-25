@@ -26,18 +26,6 @@ class _AppState extends State<App> {
   ColorScheme? _imageColorScheme = const ColorScheme.light();
   ColorSelectionMethod _colorSelectionMethod = ColorSelectionMethod.colorSeed;
 
-  bool get _useLightMode => switch (_themeMode) {
-    ThemeMode.system =>
-      View.of(context).platformDispatcher.platformBrightness ==
-          Brightness.light,
-    ThemeMode.light => true,
-    ThemeMode.dark => false,
-  };
-
-  void _handleBrightnessChange(bool useLightMode) {}
-
-  void _handleMaterialVersionChange() {}
-
   void _handleColorSelect(int value) {
     setState(() {
       _colorSelectionMethod = ColorSelectionMethod.colorSeed;
@@ -64,34 +52,39 @@ class _AppState extends State<App> {
       debugShowCheckedModeBanner: false,
       title: 'Material 3',
       themeMode: _themeMode,
-      theme: ThemeData(
-        colorSchemeSeed: _colorSelectionMethod == ColorSelectionMethod.colorSeed
-            ? _colorSelected.color
-            : null,
-        colorScheme: _colorSelectionMethod == ColorSelectionMethod.image
-            ? _imageColorScheme
-            : null,
-        useMaterial3: _useMaterial3,
-        brightness: Brightness.light,
-      ),
-      darkTheme: ThemeData(
-        colorSchemeSeed: _colorSelectionMethod == ColorSelectionMethod.colorSeed
-            ? _colorSelected.color
-            : _imageColorScheme!.primary,
-        useMaterial3: _useMaterial3,
-        brightness: Brightness.dark,
-      ),
+      theme: _buildLightTheme(),
+      darkTheme: _buildDarkTheme(),
       home: Home(
-        useLightMode: _useLightMode,
         useMaterial3: _useMaterial3,
         colorSelected: _colorSelected,
         imageSelected: _imageSelected,
-        handleBrightnessChange: _handleBrightnessChange,
-        handleMaterialVersionChange: _handleMaterialVersionChange,
         handleColorSelect: _handleColorSelect,
         handleImageSelect: _handleImageSelect,
         colorSelectionMethod: _colorSelectionMethod,
       ),
+    );
+  }
+
+  ThemeData _buildLightTheme() {
+    return ThemeData(
+      colorSchemeSeed: _colorSelectionMethod == ColorSelectionMethod.colorSeed
+          ? _colorSelected.color
+          : null,
+      colorScheme: _colorSelectionMethod == ColorSelectionMethod.image
+          ? _imageColorScheme
+          : null,
+      useMaterial3: _useMaterial3,
+      brightness: Brightness.light,
+    );
+  }
+
+  ThemeData _buildDarkTheme() {
+    return ThemeData(
+      colorSchemeSeed: _colorSelectionMethod == ColorSelectionMethod.colorSeed
+          ? _colorSelected.color
+          : _imageColorScheme!.primary,
+      useMaterial3: _useMaterial3,
+      brightness: Brightness.dark,
     );
   }
 }

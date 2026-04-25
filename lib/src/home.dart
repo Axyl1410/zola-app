@@ -17,25 +17,19 @@ import 'typography_screen.dart';
 class Home extends StatefulWidget {
   const Home({
     super.key,
-    required this.useLightMode,
     required this.useMaterial3,
     required this.colorSelected,
-    required this.handleBrightnessChange,
-    required this.handleMaterialVersionChange,
     required this.handleColorSelect,
     required this.handleImageSelect,
     required this.colorSelectionMethod,
     required this.imageSelected,
   });
 
-  final bool useLightMode;
   final bool useMaterial3;
   final ColorSeed colorSelected;
   final ColorImageProvider imageSelected;
   final ColorSelectionMethod colorSelectionMethod;
 
-  final void Function(bool useLightMode) handleBrightnessChange;
-  final void Function() handleMaterialVersionChange;
   final void Function(int value) handleColorSelect;
   final void Function(int value) handleImageSelect;
 
@@ -106,9 +100,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   }
 
   void handleScreenChanged(int screenSelected) {
-    setState(() {
-      screenIndex = screenSelected;
-    });
+    screenIndex = screenSelected;
   }
 
   Widget createScreenFor(
@@ -137,21 +129,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           ? const Text('Material 3')
           : const Text('Material 2'),
       actions: !showMediumSizeLayout && !showLargeSizeLayout
-          ? [
-              // Material3Button(
-              //   handleMaterialVersionChange: widget.handleMaterialVersionChange,
-              // ),
-              // ColorSeedButton(
-              //   handleColorSelect: widget.handleColorSelect,
-              //   colorSelected: widget.colorSelected,
-              //   colorSelectionMethod: widget.colorSelectionMethod,
-              // ),
-              // ColorImageButton(
-              //   handleImageSelect: widget.handleImageSelect,
-              //   imageSelected: widget.imageSelected,
-              //   colorSelectionMethod: widget.colorSelectionMethod,
-              // ),
-            ]
+          ? const []
           : [Container()],
     );
   }
