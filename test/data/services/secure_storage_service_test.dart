@@ -149,6 +149,22 @@ void main() {
       expect(storage.containsKey('auth.expiresAt'), isFalse);
     });
 
+    test(
+      'getValidToken returns null and clears session for zero ttl session',
+      () async {
+        final service = SecureStorageService();
+        await service.saveSessionToken('zero-ttl-token', ttl: Duration.zero);
+        await Future<void>.delayed(const Duration(milliseconds: 1));
+
+        final token = await service.getValidToken();
+
+        expect(token, isNull);
+        expect(storage.containsKey('auth.token'), isFalse);
+        expect(storage.containsKey('auth.receivedAt'), isFalse);
+        expect(storage.containsKey('auth.expiresAt'), isFalse);
+      },
+    );
+
     test('clearSession deletes all auth-related fields', () async {
       final service = SecureStorageService();
       storage['auth.token'] = 'x';
