@@ -1,28 +1,35 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'screens/business_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/school_screen.dart';
 import 'screens/settings_screen.dart';
 
-class HomeView extends HookWidget {
+class HomeView extends StatefulWidget {
   const HomeView({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final counter = useState(0);
-    final selectedIndex = useState(0);
+  State<HomeView> createState() => _HomeViewState();
+}
 
+class _HomeViewState extends State<HomeView> {
+  int _counter = 0;
+  int _selectedIndex = 0;
+
+  @override
+  Widget build(BuildContext context) {
     final pages = <Widget>[
-      HomeScreen(counter: counter.value, onIncrement: () => counter.value++),
+      HomeScreen(
+        counter: _counter,
+        onIncrement: () => setState(() => _counter++),
+      ),
       const BusinessScreen(),
       const SchoolScreen(),
       const SettingsScreen(),
       const ProfileScreen(),
     ];
 
-    final safeIndex = selectedIndex.value.clamp(0, pages.length - 1);
+    final safeIndex = _selectedIndex.clamp(0, pages.length - 1);
 
     return Scaffold(
       body: IndexedStack(index: safeIndex, children: pages),
@@ -31,7 +38,7 @@ class HomeView extends HookWidget {
         selectedItemColor: Colors.lightBlue,
         unselectedItemColor: Colors.grey,
         currentIndex: safeIndex,
-        onTap: (index) => selectedIndex.value = index,
+        onTap: (index) => setState(() => _selectedIndex = index),
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
