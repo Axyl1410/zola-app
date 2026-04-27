@@ -1,4 +1,4 @@
-# teamo
+# zola
 
 A new Flutter project.
 

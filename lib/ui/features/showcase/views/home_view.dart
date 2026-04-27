@@ -158,7 +158,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                     ? ExpandedTrailingActions(
                         handleImageSelect: widget.viewModel.selectImage,
                         handleColorSelect: widget.viewModel.selectColor,
-                        colorSelectionMethod: widget.viewModel.colorSelectionMethod,
+                        colorSelectionMethod:
+                            widget.viewModel.colorSelectionMethod,
                         imageSelected: widget.viewModel.imageSelected,
                         colorSelected: widget.viewModel.colorSelected,
                       )

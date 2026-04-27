@@ -1,4 +1,4 @@
-# Flutter Architecture Flow (Teamo)
+# Flutter Architecture Flow (Zola)
 
 Tai lieu nay chot luong kien truc cho codebase de de scale va giu code sach.
 

@@ -36,7 +36,7 @@ class _AppState extends State<App> {
       listenable: _viewModel,
       builder: (context, _) => MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'Teamo',
+        title: 'Zola',
         themeMode: _themeMode,
         theme: _buildLightTheme(),
         darkTheme: _buildDarkTheme(),

@@ -1,4 +1,4 @@
-package com.example.teamo
+package com.example.zola
 
 import io.flutter.embedding.android.FlutterActivity
 

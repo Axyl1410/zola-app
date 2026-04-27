@@ -1,8 +1,8 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:teamo/data/repositories/auth_session_repository.dart';
-import 'package:teamo/data/services/secure_storage_service.dart';
-import 'package:teamo/domain/models/auth_session.dart';
+import 'package:zola/data/repositories/auth_session_repository.dart';
+import 'package:zola/data/services/secure_storage_service.dart';
+import 'package:zola/domain/models/auth_session.dart';
 
 void main() {
   group('AuthSessionRepository', () {

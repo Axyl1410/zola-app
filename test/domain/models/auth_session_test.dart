@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:teamo/domain/models/auth_session.dart';
+import 'package:zola/domain/models/auth_session.dart';
 
 void main() {
   group('AuthSession', () {

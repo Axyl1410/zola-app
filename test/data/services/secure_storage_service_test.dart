@@ -1,6 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:teamo/data/services/secure_storage_service.dart';
+import 'package:zola/data/services/secure_storage_service.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
