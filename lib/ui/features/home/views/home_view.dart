@@ -1,40 +1,51 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'screens/business_screen.dart';
+import 'screens/home_screen.dart';
+import 'screens/profile_screen.dart';
+import 'screens/school_screen.dart';
+import 'screens/settings_screen.dart';
 
-class HomeView extends StatefulWidget {
+class HomeView extends HookWidget {
   const HomeView({super.key});
 
   @override
-  State<HomeView> createState() => _HomeViewState();
-}
-
-class _HomeViewState extends State<HomeView> {
-  @override
   Widget build(BuildContext context) {
+    final counter = useState(0);
+    final selectedIndex = useState(0);
+
+    final pages = <Widget>[
+      HomeScreen(counter: counter.value, onIncrement: () => counter.value++),
+      const BusinessScreen(),
+      const SchoolScreen(),
+      const SettingsScreen(),
+      const ProfileScreen(),
+    ];
+
+    final safeIndex = selectedIndex.value.clamp(0, pages.length - 1);
+
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.lightBlue,
-        centerTitle: false,
-        title: Text(
-          'Tìm kiếm',
-          style: GoogleFonts.beVietnamPro(color: Colors.white, fontSize: 16),
-        ),
-        leading: IconButton(
-          onPressed: () {},
-          icon: Icon(Icons.search, color: Colors.white),
-        ),
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: Icon(Icons.image, color: Colors.white),
+      body: IndexedStack(index: safeIndex, children: pages),
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.shifting,
+        selectedItemColor: Colors.lightBlue,
+        unselectedItemColor: Colors.grey,
+        currentIndex: safeIndex,
+        onTap: (index) => selectedIndex.value = index,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.business),
+            label: 'Business',
           ),
-          IconButton(
-            onPressed: () {},
-            icon: Icon(Icons.notifications_none, color: Colors.white),
+          BottomNavigationBarItem(icon: Icon(Icons.school), label: 'School'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: 'Settings',
           ),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),
-      body: Center(child: Text('hello world')),
     );
   }
 }

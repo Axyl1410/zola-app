@@ -1,8 +1,5 @@
-// Copyright 2021 The Flutter team. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:zola/ui/features/home/views/home_view.dart';
 
 import 'di/injector.dart';
@@ -12,17 +9,12 @@ import 'ui/features/showcase/view_models/showcase_view_model.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   setupDependencies();
-  runApp(const App());
+  runApp(App());
 }
 
-class App extends StatefulWidget {
-  const App({super.key});
+class App extends HookWidget {
+  App({super.key});
 
-  @override
-  State<App> createState() => _AppState();
-}
-
-class _AppState extends State<App> {
   static const bool _useMaterial3 = true;
   static const ThemeMode _themeMode = ThemeMode.system;
   final ShowcaseViewModel _viewModel = sl<ShowcaseViewModel>();
@@ -38,7 +30,7 @@ class _AppState extends State<App> {
         theme: _buildLightTheme(),
         // darkTheme: _buildDarkTheme(),
         // home: ShowcaseHome(useMaterial3: _useMaterial3, viewModel: _viewModel),
-        home: const HomeView(),
+        home: HomeView(),
       ),
     );
   }

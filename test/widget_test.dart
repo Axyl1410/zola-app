@@ -22,7 +22,7 @@ void main() {
   testWidgets('App renders home search UI', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(const App());
+    await tester.pumpWidget(App());
     await tester.pumpAndSettle();
 
     expect(find.text('Tìm kiếm'), findsOneWidget);
