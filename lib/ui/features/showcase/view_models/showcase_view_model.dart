@@ -4,8 +4,8 @@ import '../../../../data/repositories/showcase_theme_repository.dart';
 import '../../../core/constants/showcase_constants.dart';
 
 class ShowcaseViewModel extends ChangeNotifier {
-  ShowcaseViewModel({ShowcaseThemeRepository? themeRepository})
-    : _themeRepository = themeRepository ?? ShowcaseThemeRepository();
+  ShowcaseViewModel({required ShowcaseThemeRepository themeRepository})
+    : _themeRepository = themeRepository;
 
   final ShowcaseThemeRepository _themeRepository;
 

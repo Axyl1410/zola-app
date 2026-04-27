@@ -2,8 +2,8 @@ import '../../domain/models/auth_session.dart';
 import '../services/secure_storage_service.dart';
 
 class AuthSessionRepository {
-  AuthSessionRepository({SecureStorageService? secureStorageService})
-    : _secureStorageService = secureStorageService ?? SecureStorageService();
+  AuthSessionRepository({required SecureStorageService secureStorageService})
+    : _secureStorageService = secureStorageService;
 
   final SecureStorageService _secureStorageService;
 

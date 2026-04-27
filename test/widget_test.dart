@@ -8,15 +8,24 @@
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:zola/main.dart';
+import 'di/test_injector.dart';
 
 void main() {
-  testWidgets('Showcase app renders key navigation labels', (
+  setUp(() async {
+    await setupTestDependencies();
+  });
+
+  tearDown(() async {
+    await resetTestDependencies();
+  });
+
+  testWidgets('App renders home search UI', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(const App());
     await tester.pumpAndSettle();
 
-    expect(find.text('Material 3'), findsWidgets);
-    expect(find.text('Components'), findsWidgets);
+    expect(find.text('Tìm kiếm'), findsOneWidget);
+    expect(find.text('hello world'), findsOneWidget);
   });
 }

@@ -11,17 +11,22 @@ import 'navigation_transition_view.dart';
 import 'one_two_transition_view.dart';
 import 'widgets/expanded_trailing_actions.dart';
 
-class Home extends StatefulWidget {
-  const Home({super.key, required this.useMaterial3, required this.viewModel});
+class ShowcaseHome extends StatefulWidget {
+  const ShowcaseHome({
+    super.key,
+    required this.useMaterial3,
+    required this.viewModel,
+  });
 
   final bool useMaterial3;
   final ShowcaseViewModel viewModel;
 
   @override
-  State<Home> createState() => _HomeState();
+  State<ShowcaseHome> createState() => _ShowcaseHomeState();
 }
 
-class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
+class _ShowcaseHomeState extends State<ShowcaseHome>
+    with SingleTickerProviderStateMixin {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   late final AnimationController controller;
   late final CurvedAnimation railAnimation;

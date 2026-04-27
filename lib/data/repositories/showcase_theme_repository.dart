@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import '../services/color_scheme_service.dart';
 
 class ShowcaseThemeRepository {
-  ShowcaseThemeRepository({ColorSchemeService? colorSchemeService})
-    : _colorSchemeService = colorSchemeService ?? ColorSchemeService();
+  ShowcaseThemeRepository({required ColorSchemeService colorSchemeService})
+    : _colorSchemeService = colorSchemeService;
 
   final ColorSchemeService _colorSchemeService;
 
