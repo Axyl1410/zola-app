@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
+import '../../../../../domain/models/google_auth_result.dart';
 import '../../view_models/messages_view_model.dart';
 import '../widgets/default_home_app_bar.dart';
 
@@ -20,30 +23,45 @@ class MessagesScreen extends StatefulWidget {
 }
 
 class _MessagesScreenState extends State<MessagesScreen> {
+  bool _isHandlingAuthResult = false;
+
   @override
   void initState() {
     super.initState();
-    widget.viewModel.addListener(_handleViewModelChanges);
+    widget.viewModel.addListener(_onViewModelChanged);
   }
 
   @override
   void dispose() {
-    widget.viewModel.removeListener(_handleViewModelChanges);
+    widget.viewModel.removeListener(_onViewModelChanged);
     super.dispose();
   }
 
-  Future<void> _handleViewModelChanges() async {
+  void _onViewModelChanged() {
     final errorMessage = widget.viewModel.errorMessage;
     final authResult = widget.viewModel.authResult;
-    if (!mounted) return;
-
-    if (errorMessage != null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Google sign-in error: $errorMessage')));
+    if (!mounted) {
+      return;
     }
 
-    if (authResult != null) {
+    if (errorMessage != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Google sign-in error: $errorMessage')),
+      );
+    }
+
+    if (authResult == null || _isHandlingAuthResult) {
+      return;
+    }
+    unawaited(_handleAuthResult(authResult));
+  }
+
+  Future<void> _handleAuthResult(GoogleAuthResult authResult) async {
+    _isHandlingAuthResult = true;
+    try {
+      if (!mounted) {
+        return;
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -59,7 +77,11 @@ class _MessagesScreenState extends State<MessagesScreen> {
         idToken: authResult.idToken,
         accessToken: authResult.accessToken,
       );
-      widget.viewModel.clearAuthResult();
+      if (mounted) {
+        widget.viewModel.clearAuthResult();
+      }
+    } finally {
+      _isHandlingAuthResult = false;
     }
   }
 
@@ -71,32 +93,31 @@ class _MessagesScreenState extends State<MessagesScreen> {
   }) {
     return showDialog<void>(
       context: context,
-      builder:
-          (BuildContext dialogContext) => AlertDialog(
-            title: const Text('Google Login Result'),
-            content: SizedBox(
-              width: 420,
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    SelectableText('Email: $email'),
-                    const SizedBox(height: 12),
-                    SelectableText('idToken:\n${idToken ?? "null"}'),
-                    const SizedBox(height: 12),
-                    SelectableText('accessToken:\n$accessToken'),
-                  ],
-                ),
-              ),
+      builder: (BuildContext dialogContext) => AlertDialog(
+        title: const Text('Google Login Result'),
+        content: SizedBox(
+          width: 420,
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                SelectableText('Email: $email'),
+                const SizedBox(height: 12),
+                SelectableText('idToken:\n${idToken ?? "null"}'),
+                const SizedBox(height: 12),
+                SelectableText('accessToken:\n$accessToken'),
+              ],
             ),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () => Navigator.of(dialogContext).pop(),
-                child: const Text('Close'),
-              ),
-            ],
           ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -124,10 +145,9 @@ class _MessagesScreenState extends State<MessagesScreen> {
                 ),
                 const SizedBox(height: 12),
                 ElevatedButton(
-                  onPressed:
-                      widget.viewModel.isLoading
-                          ? null
-                          : widget.viewModel.signInWithGoogle,
+                  onPressed: widget.viewModel.isLoading
+                      ? null
+                      : widget.viewModel.signInWithGoogle,
                   child: Text(
                     widget.viewModel.isLoading
                         ? 'Signing in...'

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../di/injector.dart';
+import '../view_models/messages_view_model.dart';
 import 'screens/contacts_screen.dart';
 import 'screens/discover_screen.dart';
 import 'screens/messages_screen.dart';
@@ -17,6 +18,19 @@ class HomeView extends StatefulWidget {
 class _HomeViewState extends State<HomeView> {
   int _counter = 0;
   int _selectedIndex = 0;
+  late final MessagesViewModel _messagesViewModel;
+
+  @override
+  void initState() {
+    super.initState();
+    _messagesViewModel = sl<MessagesViewModel>();
+  }
+
+  @override
+  void dispose() {
+    _messagesViewModel.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +38,7 @@ class _HomeViewState extends State<HomeView> {
       MessagesScreen(
         counter: _counter,
         onIncrement: () => setState(() => _counter++),
-        viewModel: sl(),
+        viewModel: _messagesViewModel,
       ),
       const ContactsScreen(),
       const DiscoverScreen(),
@@ -44,22 +58,30 @@ class _HomeViewState extends State<HomeView> {
         onTap: (index) => setState(() => _selectedIndex = index),
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
+            backgroundColor: Colors.white,
             icon: Icon(Icons.chat_outlined),
             label: 'Tin nhắn',
           ),
           BottomNavigationBarItem(
+            backgroundColor: Colors.white,
             icon: Icon(Icons.perm_contact_calendar_outlined),
             label: 'Danh bạ',
           ),
           BottomNavigationBarItem(
+            backgroundColor: Colors.white,
             icon: Icon(Icons.grid_view_rounded),
             label: 'Khám phá',
           ),
           BottomNavigationBarItem(
+            backgroundColor: Colors.white,
             icon: Icon(Icons.calendar_month_outlined),
             label: 'Tường nhà',
           ),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Cá nhân'),
+          BottomNavigationBarItem(
+            backgroundColor: Colors.white,
+            icon: Icon(Icons.person),
+            label: 'Cá nhân',
+          ),
         ],
       ),
     );
