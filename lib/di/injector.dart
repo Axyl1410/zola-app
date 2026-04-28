@@ -1,12 +1,15 @@
 import 'package:get_it/get_it.dart';
 
 import '../data/repositories/auth_session_repository.dart';
+import '../data/repositories/google_auth_repository.dart';
 import '../data/repositories/showcase_theme_repository.dart';
 import '../data/repositories/todo_repository.dart';
 import '../data/services/api_client.dart';
 import '../data/services/color_scheme_service.dart';
+import '../data/services/google_sign_in_service.dart';
 import '../data/services/secure_storage_service.dart';
 import '../data/services/todo_remote_service.dart';
+import '../ui/features/home/view_models/messages_view_model.dart';
 import '../ui/features/home/view_models/school_view_model.dart';
 import '../ui/features/showcase/view_models/showcase_view_model.dart';
 
@@ -45,6 +48,14 @@ void setupDependencies() {
       () => TodoRepository(todoRemoteService: sl()),
     );
   }
+  if (!sl.isRegistered<GoogleSignInService>()) {
+    sl.registerLazySingleton<GoogleSignInService>(GoogleSignInService.new);
+  }
+  if (!sl.isRegistered<GoogleAuthRepository>()) {
+    sl.registerLazySingleton<GoogleAuthRepository>(
+      () => GoogleAuthRepository(googleSignInService: sl()),
+    );
+  }
 
   // Presentation layer
   if (!sl.isRegistered<ShowcaseViewModel>()) {
@@ -55,6 +66,11 @@ void setupDependencies() {
   if (!sl.isRegistered<SchoolViewModel>()) {
     sl.registerFactory<SchoolViewModel>(
       () => SchoolViewModel(todoRepository: sl()),
+    );
+  }
+  if (!sl.isRegistered<MessagesViewModel>()) {
+    sl.registerFactory<MessagesViewModel>(
+      () => MessagesViewModel(googleAuthRepository: sl()),
     );
   }
 }

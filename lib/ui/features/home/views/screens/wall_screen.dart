@@ -61,7 +61,7 @@ class _WallScreenState extends State<WallScreen> {
               ),
               SizedBox(height: 14),
               SizedBox(
-                height: 40,
+                height: 35,
                 child: ListView.separated(
                   shrinkWrap: true,
                   scrollDirection: Axis.horizontal,
@@ -81,7 +81,7 @@ class _WallScreenState extends State<WallScreen> {
                         children: <Widget>[
                           Text(
                             wallItem.name,
-                            style: GoogleFonts.beVietnamPro(),
+                            style: GoogleFonts.beVietnamPro(fontSize: 14),
                           ),
                         ],
                       ),

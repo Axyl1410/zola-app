@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import '../../../../di/injector.dart';
 import 'screens/contacts_screen.dart';
 import 'screens/discover_screen.dart';
 import 'screens/messages_screen.dart';
@@ -22,6 +24,7 @@ class _HomeViewState extends State<HomeView> {
       MessagesScreen(
         counter: _counter,
         onIncrement: () => setState(() => _counter++),
+        viewModel: sl(),
       ),
       const ContactsScreen(),
       const DiscoverScreen(),
