@@ -4,14 +4,14 @@ import 'package:zola/ui/features/home/view_models/school_view_model.dart';
 
 import '../widgets/default_home_app_bar.dart';
 
-class SchoolScreen extends StatefulWidget {
-  const SchoolScreen({super.key});
+class DiscoverScreen extends StatefulWidget {
+  const DiscoverScreen({super.key});
 
   @override
-  State<SchoolScreen> createState() => _SchoolScreenState();
+  State<DiscoverScreen> createState() => _DiscoverScreenState();
 }
 
-class _SchoolScreenState extends State<SchoolScreen> {
+class _DiscoverScreenState extends State<DiscoverScreen> {
   late final SchoolViewModel _viewModel;
 
   @override
@@ -30,7 +30,7 @@ class _SchoolScreenState extends State<SchoolScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: buildDefaultHomeAppBar(title: 'School'),
+      appBar: buildDefaultHomeAppBar(title: 'Khám phá dịch vụ'),
       body: ListenableBuilder(
         listenable: _viewModel,
         builder: (context, _) => _buildBody(),
@@ -48,7 +48,7 @@ class _SchoolScreenState extends State<SchoolScreen> {
         onRefresh: () => _viewModel.loadTodo(1),
         child: ListView(
           physics: const AlwaysScrollableScrollPhysics(),
-          children: [
+          children: <Widget>[
             Padding(
               padding: const EdgeInsets.all(24),
               child: Text(
@@ -66,8 +66,8 @@ class _SchoolScreenState extends State<SchoolScreen> {
       return RefreshIndicator(
         onRefresh: () => _viewModel.loadTodo(1),
         child: ListView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          children: const [
+          physics: AlwaysScrollableScrollPhysics(),
+          children: <Widget>[
             Padding(
               padding: EdgeInsets.all(24),
               child: Text(
@@ -83,8 +83,8 @@ class _SchoolScreenState extends State<SchoolScreen> {
     return RefreshIndicator(
       onRefresh: () => _viewModel.loadTodo(1),
       child: ListView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        children: [
+        physics: AlwaysScrollableScrollPhysics(),
+        children: <Widget>[
           Card(
             margin: const EdgeInsets.all(16),
             child: Padding(
@@ -92,7 +92,7 @@ class _SchoolScreenState extends State<SchoolScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+                children: <Widget>[
                   Text('userId: ${todo.userId}'),
                   Text('id: ${todo.id}'),
                   Text('title: ${todo.title}'),

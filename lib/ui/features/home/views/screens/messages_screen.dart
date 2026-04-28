@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+
 import '../widgets/default_home_app_bar.dart';
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({
+class MessagesScreen extends StatelessWidget {
+  const MessagesScreen({
     super.key,
     required this.counter,
     required this.onIncrement,
@@ -19,8 +20,8 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const Text('hello world'),
+          children: <Widget>[
+            const Text('Tin nhan'),
             Text('$counter'),
             TextButton(
               style: TextButton.styleFrom(

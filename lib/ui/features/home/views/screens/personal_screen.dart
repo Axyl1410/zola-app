@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../widgets/default_home_app_bar.dart';
 
-class SettingsScreen extends StatelessWidget {
-  const SettingsScreen({super.key});
+class PersonalScreen extends StatelessWidget {
+  const PersonalScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -11,7 +11,7 @@ class SettingsScreen extends StatelessWidget {
       appBar: buildDefaultHomeAppBar(),
       body: const Center(
         child: Text(
-          'Index: Settings',
+          'Ca nhan',
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
       ),

@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:zola/ui/features/home/views/screens/full_screen_page.dart';
+
+import 'full_screen_page.dart';
 import '../widgets/default_home_app_bar.dart';
 
-class BusinessScreen extends StatelessWidget {
-  const BusinessScreen({super.key});
+class ContactsScreen extends StatelessWidget {
+  const ContactsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: buildDefaultHomeAppBar(title: 'Business'),
+      appBar: buildDefaultHomeAppBar(),
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          children: [
+          children: <Widget>[
             const Text(
-              'Index: Business',
+              'Danh ba',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             TextButton(
