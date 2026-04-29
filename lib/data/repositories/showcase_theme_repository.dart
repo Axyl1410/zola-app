@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../services/color_scheme_service.dart';
+import 'package:zola/data/services/color_scheme_service.dart';
 
 class ShowcaseThemeRepository {
   ShowcaseThemeRepository({required ColorSchemeService colorSchemeService})

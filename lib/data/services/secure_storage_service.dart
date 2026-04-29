@@ -1,6 +1,5 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-
-import '../../domain/models/auth_session.dart';
+import 'package:zola/domain/models/auth_session.dart';
 
 class SecureStorageService {
   SecureStorageService({FlutterSecureStorage? storage})

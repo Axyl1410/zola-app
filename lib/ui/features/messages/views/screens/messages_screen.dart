@@ -1,22 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-
-import '../../../../../domain/models/google_auth_result.dart';
-import '../../view_models/messages_view_model.dart';
-import '../widgets/default_home_app_bar.dart';
+import 'package:zola/di/injector.dart';
+import 'package:zola/domain/models/google_auth_result.dart';
+import 'package:zola/ui/core/widgets/default_home_app_bar.dart';
+import 'package:zola/ui/features/messages/view_models/messages_view_model.dart';
 
 class MessagesScreen extends StatefulWidget {
-  const MessagesScreen({
-    super.key,
-    required this.counter,
-    required this.onIncrement,
-    required this.viewModel,
-  });
-
-  final int counter;
-  final VoidCallback onIncrement;
-  final MessagesViewModel viewModel;
+  const MessagesScreen({super.key});
 
   @override
   State<MessagesScreen> createState() => _MessagesScreenState();
@@ -24,22 +15,26 @@ class MessagesScreen extends StatefulWidget {
 
 class _MessagesScreenState extends State<MessagesScreen> {
   bool _isHandlingAuthResult = false;
+  int _counter = 0;
+  late final MessagesViewModel _viewModel;
 
   @override
   void initState() {
     super.initState();
-    widget.viewModel.addListener(_onViewModelChanged);
+    _viewModel = sl<MessagesViewModel>();
+    _viewModel.addListener(_onViewModelChanged);
   }
 
   @override
   void dispose() {
-    widget.viewModel.removeListener(_onViewModelChanged);
+    _viewModel.removeListener(_onViewModelChanged);
+    _viewModel.dispose();
     super.dispose();
   }
 
   void _onViewModelChanged() {
-    final errorMessage = widget.viewModel.errorMessage;
-    final authResult = widget.viewModel.authResult;
+    final errorMessage = _viewModel.errorMessage;
+    final authResult = _viewModel.authResult;
     if (!mounted) {
       return;
     }
@@ -78,7 +73,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
         accessToken: authResult.accessToken,
       );
       if (mounted) {
-        widget.viewModel.clearAuthResult();
+        _viewModel.clearAuthResult();
       }
     } finally {
       _isHandlingAuthResult = false;
@@ -127,29 +122,29 @@ class _MessagesScreenState extends State<MessagesScreen> {
       appBar: buildDefaultHomeAppBar(),
       body: Center(
         child: ListenableBuilder(
-          listenable: widget.viewModel,
+          listenable: _viewModel,
           builder: (context, _) {
             return Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 const Text('Tin nhan'),
-                Text('${widget.counter}'),
+                Text('$_counter'),
                 TextButton(
                   style: TextButton.styleFrom(
                     backgroundColor: Colors.blue,
                     foregroundColor: Colors.white,
                   ),
-                  onPressed: widget.onIncrement,
+                  onPressed: () => setState(() => _counter++),
                   child: const Text('Click me'),
                 ),
                 const SizedBox(height: 12),
                 ElevatedButton(
-                  onPressed: widget.viewModel.isLoading
+                  onPressed: _viewModel.isLoading
                       ? null
-                      : widget.viewModel.signInWithGoogle,
+                      : _viewModel.signInWithGoogle,
                   child: Text(
-                    widget.viewModel.isLoading
+                    _viewModel.isLoading
                         ? 'Signing in...'
                         : 'Test Google Login',
                   ),

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
-import '../models/todo_api_model.dart';
+import 'package:zola/data/models/todo_api_model.dart';
+
 import 'api_client.dart';
 
 class TodoRemoteService {

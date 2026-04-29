@@ -9,8 +9,8 @@ import 'package:zola/data/services/google_sign_in_service.dart';
 import 'package:zola/data/services/secure_storage_service.dart';
 import 'package:zola/data/services/todo_remote_service.dart';
 import 'package:zola/di/injector.dart';
-import 'package:zola/ui/features/home/view_models/messages_view_model.dart';
-import 'package:zola/ui/features/home/view_models/school_view_model.dart';
+import 'package:zola/ui/features/discover/view_models/school_view_model.dart';
+import 'package:zola/ui/features/messages/view_models/messages_view_model.dart';
 import 'package:zola/ui/features/showcase/view_models/showcase_view_model.dart';
 
 void main() {

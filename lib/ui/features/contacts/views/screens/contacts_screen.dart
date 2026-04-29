@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:zola/ui/core/widgets/default_home_app_bar.dart';
 
 import 'full_screen_page.dart';
-import '../widgets/default_home_app_bar.dart';
 
 class ContactsScreen extends StatelessWidget {
   const ContactsScreen({super.key});

@@ -3,7 +3,7 @@ import 'package:zola/data/models/google_sign_in_tokens_model.dart';
 import 'package:zola/data/repositories/google_auth_repository.dart';
 import 'package:zola/data/services/google_sign_in_service.dart';
 import 'package:zola/domain/models/google_auth_result.dart';
-import 'package:zola/ui/features/home/view_models/messages_view_model.dart';
+import 'package:zola/ui/features/messages/view_models/messages_view_model.dart';
 
 void main() {
   group('MessagesViewModel', () {

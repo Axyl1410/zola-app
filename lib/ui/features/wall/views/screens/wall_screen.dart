@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
-import '../widgets/default_home_app_bar.dart';
+import 'package:zola/ui/core/widgets/default_home_app_bar.dart';
 
 class WallScreen extends StatefulWidget {
   const WallScreen({super.key});
@@ -19,18 +18,13 @@ class _WallScreenState extends State<WallScreen> {
   ];
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: buildDefaultHomeAppBar(),
       body: SingleChildScrollView(
         child: Container(
           color: Colors.white,
-          padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
@@ -39,7 +33,7 @@ class _WallScreenState extends State<WallScreen> {
                   Container(
                     height: 50,
                     width: 50,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       image: DecorationImage(
                         image: NetworkImage(
                           'https://images.unsplash.com/photo-1774050952646-a850ad28ad6f?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
@@ -49,7 +43,7 @@ class _WallScreenState extends State<WallScreen> {
                       shape: BoxShape.circle,
                     ),
                   ),
-                  SizedBox(width: 16),
+                  const SizedBox(width: 16),
                   Text(
                     'Hôm nay của bạn thế nào?',
                     style: GoogleFonts.beVietnamPro(
@@ -59,7 +53,7 @@ class _WallScreenState extends State<WallScreen> {
                   ),
                 ],
               ),
-              SizedBox(height: 14),
+              const SizedBox(height: 14),
               SizedBox(
                 height: 35,
                 child: ListView.separated(
@@ -69,13 +63,15 @@ class _WallScreenState extends State<WallScreen> {
                     final wallItem = _wallItems[index];
 
                     return Container(
-                      padding: EdgeInsets.symmetric(
+                      padding: const EdgeInsets.symmetric(
                         horizontal: 14,
                         vertical: 8,
                       ),
                       decoration: BoxDecoration(
                         color: Colors.grey[200],
-                        borderRadius: BorderRadius.all(Radius.circular(32)),
+                        borderRadius: const BorderRadius.all(
+                          Radius.circular(32),
+                        ),
                       ),
                       child: Row(
                         children: <Widget>[
@@ -88,7 +84,7 @@ class _WallScreenState extends State<WallScreen> {
                     );
                   },
                   separatorBuilder: (context, index) {
-                    return SizedBox(width: 8);
+                    return const SizedBox(width: 8);
                   },
                   itemCount: _wallItems.length,
                 ),

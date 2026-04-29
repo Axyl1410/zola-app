@@ -1,6 +1,5 @@
 import 'package:google_sign_in/google_sign_in.dart';
-
-import '../models/google_sign_in_tokens_model.dart';
+import 'package:zola/data/models/google_sign_in_tokens_model.dart';
 
 class GoogleSignInService {
   static const String _googleServerClientId = String.fromEnvironment(

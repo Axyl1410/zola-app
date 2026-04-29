@@ -1,5 +1,5 @@
-import '../../domain/models/todo_item.dart';
-import '../services/todo_remote_service.dart';
+import 'package:zola/data/services/todo_remote_service.dart';
+import 'package:zola/domain/models/todo_item.dart';
 
 class TodoRepository {
   TodoRepository({required TodoRemoteService todoRemoteService})

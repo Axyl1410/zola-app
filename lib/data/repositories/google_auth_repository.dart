@@ -1,5 +1,5 @@
-import '../../domain/models/google_auth_result.dart';
-import '../services/google_sign_in_service.dart';
+import 'package:zola/data/services/google_sign_in_service.dart';
+import 'package:zola/domain/models/google_auth_result.dart';
 
 class GoogleAuthRepository {
   GoogleAuthRepository({required GoogleSignInService googleSignInService})

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../widgets/default_home_app_bar.dart';
+import 'package:zola/ui/core/widgets/default_home_app_bar.dart';
+
 import 'settings_screen.dart';
 
 class PersonalScreen extends StatelessWidget {
@@ -25,7 +26,9 @@ class PersonalScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const SettingsScreen()),
+                  MaterialPageRoute(
+                    builder: (context) => const SettingsScreen(),
+                  ),
                 );
               },
               icon: const Icon(Icons.settings),

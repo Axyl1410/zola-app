@@ -6,7 +6,7 @@ import 'package:zola/data/services/api_client.dart';
 import 'package:zola/data/services/secure_storage_service.dart';
 import 'package:zola/data/services/todo_remote_service.dart';
 import 'package:zola/domain/models/todo_item.dart';
-import 'package:zola/ui/features/home/view_models/school_view_model.dart';
+import 'package:zola/ui/features/discover/view_models/school_view_model.dart';
 
 void main() {
   group('SchoolViewModel', () {

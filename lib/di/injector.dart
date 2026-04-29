@@ -1,17 +1,16 @@
 import 'package:get_it/get_it.dart';
-
-import '../data/repositories/auth_session_repository.dart';
-import '../data/repositories/google_auth_repository.dart';
-import '../data/repositories/showcase_theme_repository.dart';
-import '../data/repositories/todo_repository.dart';
-import '../data/services/api_client.dart';
-import '../data/services/color_scheme_service.dart';
-import '../data/services/google_sign_in_service.dart';
-import '../data/services/secure_storage_service.dart';
-import '../data/services/todo_remote_service.dart';
-import '../ui/features/home/view_models/messages_view_model.dart';
-import '../ui/features/home/view_models/school_view_model.dart';
-import '../ui/features/showcase/view_models/showcase_view_model.dart';
+import 'package:zola/data/repositories/auth_session_repository.dart';
+import 'package:zola/data/repositories/google_auth_repository.dart';
+import 'package:zola/data/repositories/showcase_theme_repository.dart';
+import 'package:zola/data/repositories/todo_repository.dart';
+import 'package:zola/data/services/api_client.dart';
+import 'package:zola/data/services/color_scheme_service.dart';
+import 'package:zola/data/services/google_sign_in_service.dart';
+import 'package:zola/data/services/secure_storage_service.dart';
+import 'package:zola/data/services/todo_remote_service.dart';
+import 'package:zola/ui/features/discover/view_models/school_view_model.dart';
+import 'package:zola/ui/features/messages/view_models/messages_view_model.dart';
+import 'package:zola/ui/features/showcase/view_models/showcase_view_model.dart';
 
 final GetIt sl = GetIt.instance;
 

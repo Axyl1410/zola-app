@@ -1,5 +1,5 @@
-import '../../domain/models/auth_session.dart';
-import '../services/secure_storage_service.dart';
+import 'package:zola/data/services/secure_storage_service.dart';
+import 'package:zola/domain/models/auth_session.dart';
 
 class AuthSessionRepository {
   AuthSessionRepository({required SecureStorageService secureStorageService})

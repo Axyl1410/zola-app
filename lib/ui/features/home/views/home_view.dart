@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
-
-import '../../../../di/injector.dart';
-import '../view_models/messages_view_model.dart';
-import 'screens/contacts_screen.dart';
-import 'screens/discover_screen.dart';
-import 'screens/messages_screen.dart';
-import 'screens/personal_screen.dart';
-import 'screens/wall_screen.dart';
+import 'package:zola/ui/features/contacts/views/screens/contacts_screen.dart';
+import 'package:zola/ui/features/discover/views/screens/discover_screen.dart';
+import 'package:zola/ui/features/messages/views/screens/messages_screen.dart';
+import 'package:zola/ui/features/personal/views/screens/personal_screen.dart';
+import 'package:zola/ui/features/wall/views/screens/wall_screen.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -16,30 +13,12 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-  int _counter = 0;
   int _selectedIndex = 0;
-  late final MessagesViewModel _messagesViewModel;
-
-  @override
-  void initState() {
-    super.initState();
-    _messagesViewModel = sl<MessagesViewModel>();
-  }
-
-  @override
-  void dispose() {
-    _messagesViewModel.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
     final pages = <Widget>[
-      MessagesScreen(
-        counter: _counter,
-        onIncrement: () => setState(() => _counter++),
-        viewModel: _messagesViewModel,
-      ),
+      const MessagesScreen(),
       const ContactsScreen(),
       const DiscoverScreen(),
       const WallScreen(),

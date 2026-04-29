@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-
-import '../../../../data/repositories/todo_repository.dart';
-import '../../../../domain/models/todo_item.dart';
+import 'package:zola/data/repositories/todo_repository.dart';
+import 'package:zola/domain/models/todo_item.dart';
 
 class SchoolViewModel extends ChangeNotifier {
   SchoolViewModel({required TodoRepository todoRepository})

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-
-import '../../../../data/repositories/google_auth_repository.dart';
-import '../../../../domain/models/google_auth_result.dart';
+import 'package:zola/data/repositories/google_auth_repository.dart';
+import 'package:zola/domain/models/google_auth_result.dart';
 
 class MessagesViewModel extends ChangeNotifier {
   MessagesViewModel({required GoogleAuthRepository googleAuthRepository})

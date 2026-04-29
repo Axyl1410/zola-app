@@ -2,8 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
-
-import '../repositories/auth_session_repository.dart';
+import 'package:zola/data/repositories/auth_session_repository.dart';
 
 class ApiClient {
   ApiClient({
@@ -15,10 +14,7 @@ class ApiClient {
   final AuthSessionRepository _authSessionRepository;
   final http.Client _httpClient;
 
-  Future<http.Response> get(
-    Uri uri, {
-    Map<String, String>? headers,
-  }) async {
+  Future<http.Response> get(Uri uri, {Map<String, String>? headers}) async {
     final mergedHeaders = await _buildHeaders(headers);
     return _httpClient.get(uri, headers: mergedHeaders);
   }
@@ -49,10 +45,7 @@ class ApiClient {
     return _httpClient.put(uri, headers: mergedHeaders, body: encodedBody);
   }
 
-  Future<http.Response> delete(
-    Uri uri, {
-    Map<String, String>? headers,
-  }) async {
+  Future<http.Response> delete(Uri uri, {Map<String, String>? headers}) async {
     final mergedHeaders = await _buildHeaders(headers);
     return _httpClient.delete(uri, headers: mergedHeaders);
   }

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:zola/di/injector.dart';
-import 'package:zola/ui/features/home/view_models/school_view_model.dart';
-
-import '../widgets/default_home_app_bar.dart';
+import 'package:zola/ui/core/widgets/default_home_app_bar.dart';
+import 'package:zola/ui/features/discover/view_models/school_view_model.dart';
 
 class DiscoverScreen extends StatefulWidget {
   const DiscoverScreen({super.key});
@@ -66,10 +65,10 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
       return RefreshIndicator(
         onRefresh: () => _viewModel.loadTodo(1),
         child: ListView(
-          physics: AlwaysScrollableScrollPhysics(),
+          physics: const AlwaysScrollableScrollPhysics(),
           children: <Widget>[
             Padding(
-              padding: EdgeInsets.all(24),
+              padding: const EdgeInsets.all(24),
               child: Text(
                 'No data\n\nPull down to refresh.',
                 textAlign: TextAlign.center,
@@ -83,7 +82,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     return RefreshIndicator(
       onRefresh: () => _viewModel.loadTodo(1),
       child: ListView(
-        physics: AlwaysScrollableScrollPhysics(),
+        physics: const AlwaysScrollableScrollPhysics(),
         children: <Widget>[
           Card(
             margin: const EdgeInsets.all(16),
