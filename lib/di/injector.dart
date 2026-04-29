@@ -1,9 +1,11 @@
 import 'package:get_it/get_it.dart';
+import 'package:zola/data/repositories/auth_backend_repository.dart';
 import 'package:zola/data/repositories/auth_session_repository.dart';
 import 'package:zola/data/repositories/google_auth_repository.dart';
 import 'package:zola/data/repositories/showcase_theme_repository.dart';
 import 'package:zola/data/repositories/todo_repository.dart';
 import 'package:zola/data/services/api_client.dart';
+import 'package:zola/data/services/auth_remote_service.dart';
 import 'package:zola/data/services/color_scheme_service.dart';
 import 'package:zola/data/services/google_sign_in_service.dart';
 import 'package:zola/data/services/secure_storage_service.dart';
@@ -47,12 +49,22 @@ void setupDependencies() {
       () => TodoRepository(todoRemoteService: sl()),
     );
   }
+  if (!sl.isRegistered<AuthRemoteService>()) {
+    sl.registerLazySingleton<AuthRemoteService>(
+      () => AuthRemoteService(apiClient: sl()),
+    );
+  }
   if (!sl.isRegistered<GoogleSignInService>()) {
     sl.registerLazySingleton<GoogleSignInService>(GoogleSignInService.new);
   }
   if (!sl.isRegistered<GoogleAuthRepository>()) {
     sl.registerLazySingleton<GoogleAuthRepository>(
       () => GoogleAuthRepository(googleSignInService: sl()),
+    );
+  }
+  if (!sl.isRegistered<AuthBackendRepository>()) {
+    sl.registerLazySingleton<AuthBackendRepository>(
+      () => AuthBackendRepository(authRemoteService: sl()),
     );
   }
 
@@ -69,7 +81,10 @@ void setupDependencies() {
   }
   if (!sl.isRegistered<MessagesViewModel>()) {
     sl.registerFactory<MessagesViewModel>(
-      () => MessagesViewModel(googleAuthRepository: sl()),
+      () => MessagesViewModel(
+        googleAuthRepository: sl(),
+        authBackendRepository: sl(),
+      ),
     );
   }
 }

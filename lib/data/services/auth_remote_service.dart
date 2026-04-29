@@ -1,0 +1,25 @@
+import 'package:http/http.dart' as http;
+import 'package:zola/data/config/api_endpoints.dart';
+import 'package:zola/data/services/api_client.dart';
+
+class AuthRemoteService {
+  AuthRemoteService({required ApiClient apiClient}) : _apiClient = apiClient;
+
+  final ApiClient _apiClient;
+
+  Future<http.Response> signInWithGoogle({
+    required String idToken,
+    required String accessToken,
+  }) {
+    return _apiClient.post(
+      ApiEndpoints.authSignInSocial(),
+      body: <String, dynamic>{
+        'provider': 'google',
+        'idToken': <String, dynamic>{
+          'token': idToken,
+          'accessToken': accessToken,
+        },
+      },
+    );
+  }
+}

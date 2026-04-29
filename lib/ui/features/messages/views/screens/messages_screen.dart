@@ -57,21 +57,15 @@ class _MessagesScreenState extends State<MessagesScreen> {
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            authResult.idToken == null
-                ? 'Login ok, but idToken is null'
-                : 'Login ok, idToken/accessToken received',
-          ),
-        ),
-      );
-      await _showAuthResultDialog(
+      _logAuthResult(authResult);
+      _logBackendResult();
+      final statusCode = _viewModel.backendStatusCode;
+      final message = statusCode == null
+          ? 'Google login done. Backend response missing.'
+          : 'Google + Backend done. Status: $statusCode';
+      ScaffoldMessenger.of(
         context,
-        email: authResult.email,
-        idToken: authResult.idToken,
-        accessToken: authResult.accessToken,
-      );
+      ).showSnackBar(SnackBar(content: Text(message)));
       if (mounted) {
         _viewModel.clearAuthResult();
       }
@@ -80,40 +74,19 @@ class _MessagesScreenState extends State<MessagesScreen> {
     }
   }
 
-  Future<void> _showAuthResultDialog(
-    BuildContext context, {
-    required String email,
-    required String? idToken,
-    required String accessToken,
-  }) {
-    return showDialog<void>(
-      context: context,
-      builder: (BuildContext dialogContext) => AlertDialog(
-        title: const Text('Google Login Result'),
-        content: SizedBox(
-          width: 420,
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                SelectableText('Email: $email'),
-                const SizedBox(height: 12),
-                SelectableText('idToken:\n${idToken ?? "null"}'),
-                const SizedBox(height: 12),
-                SelectableText('accessToken:\n$accessToken'),
-              ],
-            ),
-          ),
-        ),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('Close'),
-          ),
-        ],
-      ),
-    );
+  void _logAuthResult(GoogleAuthResult authResult) {
+    debugPrint('========== GOOGLE_LOGIN_SUCCESS ==========');
+    debugPrint('email: ${authResult.email}');
+    debugPrint('idToken: ${authResult.idToken ?? "null"}');
+    debugPrint('accessToken: ${authResult.accessToken}');
+    debugPrint('==========================================');
+  }
+
+  void _logBackendResult() {
+    debugPrint('===== BACKEND_SIGN_IN_SOCIAL_RESPONSE =====');
+    debugPrint('statusCode: ${_viewModel.backendStatusCode}');
+    debugPrint('body: ${_viewModel.backendResponseBody}');
+    debugPrint('===============================================');
   }
 
   @override
@@ -146,7 +119,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                   child: Text(
                     _viewModel.isLoading
                         ? 'Signing in...'
-                        : 'Test Google Login',
+                        : 'Login Google + Backend',
                   ),
                 ),
               ],
