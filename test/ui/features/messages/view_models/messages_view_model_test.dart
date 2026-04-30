@@ -29,7 +29,6 @@ void main() {
       expect(viewModel.isLoading, isFalse);
       expect(viewModel.errorMessage, isNull);
       expect(viewModel.authResult, isNotNull);
-      expect(viewModel.authResult!.email, 'user@example.com');
       expect(viewModel.authResult!.idToken, 'id-token');
       expect(viewModel.authResult!.accessToken, 'access-token');
       expect(viewModel.backendStatusCode, 200);
@@ -80,7 +79,6 @@ class _FakeGoogleAuthRepository extends GoogleAuthRepository {
       throw Exception('Google sign-in failed');
     }
     return const GoogleAuthResult(
-      email: 'user@example.com',
       idToken: 'id-token',
       accessToken: 'access-token',
     );

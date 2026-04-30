@@ -12,7 +12,6 @@ void main() {
       final result = await repository.signInWithGoogle();
 
       expect(fakeService.signInCalled, isTrue);
-      expect(result.email, 'user@example.com');
       expect(result.idToken, 'id-token');
       expect(result.accessToken, 'access-token');
     });
@@ -26,7 +25,6 @@ class _FakeGoogleSignInService extends GoogleSignInService {
   Future<GoogleSignInTokensModel> signIn() async {
     signInCalled = true;
     return const GoogleSignInTokensModel(
-      email: 'user@example.com',
       idToken: 'id-token',
       accessToken: 'access-token',
     );
