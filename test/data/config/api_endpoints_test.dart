@@ -8,5 +8,10 @@ void main() {
       expect(ApiConfig.backendBaseUrl, isEmpty);
       expect(() => ApiEndpoints.authSignInSocial(), throwsA(isA<Exception>()));
     });
+
+    test('authSignOut throws when BACKEND_BASE_URL is missing', () {
+      expect(ApiConfig.backendBaseUrl, isEmpty);
+      expect(() => ApiEndpoints.authSignOut(), throwsA(isA<Exception>()));
+    });
   });
 }
