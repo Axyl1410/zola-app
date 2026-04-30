@@ -1,4 +1,5 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:zola/data/models/google_sign_in_tokens_model.dart';
@@ -9,58 +10,79 @@ import 'package:zola/data/services/api_client.dart';
 import 'package:zola/data/services/auth_remote_service.dart';
 import 'package:zola/data/services/google_sign_in_service.dart';
 import 'package:zola/data/services/secure_storage_service.dart';
+import 'package:zola/di/providers.dart';
 import 'package:zola/domain/models/google_auth_result.dart';
-import 'package:zola/ui/features/messages/view_models/messages_view_model.dart';
 
 void main() {
-  group('MessagesViewModel', () {
+  group('MessagesNotifier', () {
     test('signInWithGoogle sets auth result on success', () async {
       final fakeRepository = _FakeGoogleAuthRepository();
       final fakeAuthBackendRepository = _FakeAuthBackendRepository();
-      final viewModel = MessagesViewModel(
-        googleAuthRepository: fakeRepository,
-        authBackendRepository: fakeAuthBackendRepository,
+      final container = ProviderContainer(
+        overrides: [
+          googleAuthRepositoryProvider.overrideWithValue(fakeRepository),
+          authBackendRepositoryProvider.overrideWithValue(
+            fakeAuthBackendRepository,
+          ),
+        ],
       );
+      addTearDown(container.dispose);
+      final notifier = container.read(messagesNotifierProvider.notifier);
 
-      await viewModel.signInWithGoogle();
+      await notifier.signInWithGoogle();
+      final state = container.read(messagesNotifierProvider);
 
       expect(fakeRepository.signInCalled, isTrue);
       expect(fakeAuthBackendRepository.signInCalled, isTrue);
-      expect(viewModel.isLoading, isFalse);
-      expect(viewModel.errorMessage, isNull);
-      expect(viewModel.authResult, isNotNull);
-      expect(viewModel.authResult!.idToken, 'id-token');
-      expect(viewModel.authResult!.accessToken, 'access-token');
-      expect(viewModel.backendStatusCode, 200);
+      expect(state.isLoading, isFalse);
+      expect(state.errorMessage, isNull);
+      expect(state.authResult, isNotNull);
+      expect(state.authResult!.idToken, 'id-token');
+      expect(state.authResult!.accessToken, 'access-token');
+      expect(state.backendStatusCode, 200);
     });
 
     test('signInWithGoogle sets error message on failure', () async {
       final fakeRepository = _FakeGoogleAuthRepository(throwOnSignIn: true);
       final fakeAuthBackendRepository = _FakeAuthBackendRepository();
-      final viewModel = MessagesViewModel(
-        googleAuthRepository: fakeRepository,
-        authBackendRepository: fakeAuthBackendRepository,
+      final container = ProviderContainer(
+        overrides: [
+          googleAuthRepositoryProvider.overrideWithValue(fakeRepository),
+          authBackendRepositoryProvider.overrideWithValue(
+            fakeAuthBackendRepository,
+          ),
+        ],
       );
+      addTearDown(container.dispose);
+      final notifier = container.read(messagesNotifierProvider.notifier);
 
-      await viewModel.signInWithGoogle();
+      await notifier.signInWithGoogle();
+      final state = container.read(messagesNotifierProvider);
 
-      expect(viewModel.isLoading, isFalse);
-      expect(viewModel.authResult, isNull);
-      expect(viewModel.errorMessage, contains('Google sign-in failed'));
+      expect(state.isLoading, isFalse);
+      expect(state.authResult, isNull);
+      expect(state.errorMessage, contains('Google sign-in failed'));
     });
 
     test('clearAuthResult resets stored auth result', () async {
       final fakeRepository = _FakeGoogleAuthRepository();
       final fakeAuthBackendRepository = _FakeAuthBackendRepository();
-      final viewModel = MessagesViewModel(
-        googleAuthRepository: fakeRepository,
-        authBackendRepository: fakeAuthBackendRepository,
+      final container = ProviderContainer(
+        overrides: [
+          googleAuthRepositoryProvider.overrideWithValue(fakeRepository),
+          authBackendRepositoryProvider.overrideWithValue(
+            fakeAuthBackendRepository,
+          ),
+        ],
       );
-      await viewModel.signInWithGoogle();
+      addTearDown(container.dispose);
+      final notifier = container.read(messagesNotifierProvider.notifier);
+      await notifier.signInWithGoogle();
 
-      viewModel.clearAuthResult();
+      notifier.clearAuthResult();
+      final state = container.read(messagesNotifierProvider);
 
-      expect(viewModel.authResult, isNull);
+      expect(state.authResult, isNull);
     });
   });
 }

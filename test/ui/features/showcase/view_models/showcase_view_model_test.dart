@@ -1,46 +1,78 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:zola/data/repositories/showcase_theme_repository.dart';
 import 'package:zola/data/services/color_scheme_service.dart';
+import 'package:zola/di/providers.dart';
 import 'package:zola/ui/core/constants/showcase_constants.dart';
-import 'package:zola/ui/features/showcase/view_models/showcase_view_model.dart';
 
 void main() {
-  group('ShowcaseViewModel', () {
+  group('ShowcaseNotifier', () {
     test('selectColor updates selected color and method', () {
-      final viewModel = ShowcaseViewModel(
-        themeRepository: _FakeShowcaseThemeRepository(),
+      final container = ProviderContainer(
+        overrides: [
+          showcaseThemeRepositoryProvider.overrideWithValue(
+            _FakeShowcaseThemeRepository(),
+          ),
+        ],
       );
+      addTearDown(container.dispose);
+      final notifier = container.read(showcaseNotifierProvider.notifier);
 
-      viewModel.selectColor(ColorSeed.values.length - 1);
+      notifier.selectColor(ColorSeed.values.length - 1);
+      final state = container.read(showcaseNotifierProvider);
 
-      expect(viewModel.colorSelectionMethod, ColorSelectionMethod.colorSeed);
-      expect(viewModel.colorSelected, ColorSeed.values.last);
+      expect(state.colorSelectionMethod, ColorSelectionMethod.colorSeed);
+      expect(state.colorSelected, ColorSeed.values.last);
     });
 
-    test('selectImage updates image selection and scheme from repository', () async {
-      final fakeRepository = _FakeShowcaseThemeRepository();
-      final viewModel = ShowcaseViewModel(themeRepository: fakeRepository);
+    test(
+      'selectImage updates image selection and scheme from repository',
+      () async {
+        final fakeRepository = _FakeShowcaseThemeRepository();
+        final container = ProviderContainer(
+          overrides: [
+            showcaseThemeRepositoryProvider.overrideWithValue(fakeRepository),
+          ],
+        );
+        addTearDown(container.dispose);
+        final notifier = container.read(showcaseNotifierProvider.notifier);
 
-      await viewModel.selectImage(ColorImageProvider.leaves.index);
+        await notifier.selectImage(ColorImageProvider.leaves.index);
+        final state = container.read(showcaseNotifierProvider);
 
-      expect(viewModel.colorSelectionMethod, ColorSelectionMethod.image);
-      expect(viewModel.imageSelected, ColorImageProvider.leaves);
-      expect(viewModel.imageColorScheme, fakeRepository.schemeToReturn);
-      expect(fakeRepository.lastRequestedUrl, ColorImageProvider.leaves.url);
-    });
+        expect(state.colorSelectionMethod, ColorSelectionMethod.image);
+        expect(state.imageSelected, ColorImageProvider.leaves);
+        expect(state.imageColorScheme, fakeRepository.schemeToReturn);
+        expect(fakeRepository.lastRequestedUrl, ColorImageProvider.leaves.url);
+      },
+    );
 
     test('selectScreen ignores same index and updates on new index', () {
-      final viewModel = ShowcaseViewModel(
-        themeRepository: _FakeShowcaseThemeRepository(),
+      final container = ProviderContainer(
+        overrides: [
+          showcaseThemeRepositoryProvider.overrideWithValue(
+            _FakeShowcaseThemeRepository(),
+          ),
+        ],
       );
-      final initialIndex = viewModel.selectedScreenIndex;
+      addTearDown(container.dispose);
+      final notifier = container.read(showcaseNotifierProvider.notifier);
+      final initialIndex = container
+          .read(showcaseNotifierProvider)
+          .selectedScreenIndex;
 
-      viewModel.selectScreen(initialIndex);
-      expect(viewModel.selectedScreenIndex, initialIndex);
+      notifier.selectScreen(initialIndex);
+      expect(
+        container.read(showcaseNotifierProvider).selectedScreenIndex,
+        initialIndex,
+      );
 
-      viewModel.selectScreen(ScreenSelected.typography.value);
-      expect(viewModel.selectedScreenIndex, ScreenSelected.typography.value);
+      notifier.selectScreen(ScreenSelected.typography.value);
+      expect(
+        container.read(showcaseNotifierProvider).selectedScreenIndex,
+        ScreenSelected.typography.value,
+      );
     });
   });
 }

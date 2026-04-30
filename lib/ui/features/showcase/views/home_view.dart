@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/constants/showcase_constants.dart';
+import '../view_models/showcase_providers.dart';
 import '../view_models/showcase_view_model.dart';
 import 'screens/buttons.dart';
 import 'screens/color_palettes_screen.dart';
@@ -11,21 +13,16 @@ import 'navigation_transition_view.dart';
 import 'one_two_transition_view.dart';
 import 'widgets/expanded_trailing_actions.dart';
 
-class ShowcaseHome extends StatefulWidget {
-  const ShowcaseHome({
-    super.key,
-    required this.useMaterial3,
-    required this.viewModel,
-  });
+class ShowcaseHome extends ConsumerStatefulWidget {
+  const ShowcaseHome({super.key, required this.useMaterial3});
 
   final bool useMaterial3;
-  final ShowcaseViewModel viewModel;
 
   @override
-  State<ShowcaseHome> createState() => _ShowcaseHomeState();
+  ConsumerState<ShowcaseHome> createState() => _ShowcaseHomeState();
 }
 
-class _ShowcaseHomeState extends State<ShowcaseHome>
+class _ShowcaseHomeState extends ConsumerState<ShowcaseHome>
     with SingleTickerProviderStateMixin {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   late final AnimationController controller;
@@ -117,30 +114,33 @@ class _ShowcaseHomeState extends State<ShowcaseHome>
     );
   }
 
-  Widget _trailingActions() => Column(
-    mainAxisAlignment: MainAxisAlignment.end,
-    children: [
-      Flexible(
-        child: ColorSeedButton(
-          handleColorSelect: widget.viewModel.selectColor,
-          colorSelected: widget.viewModel.colorSelected,
-          colorSelectionMethod: widget.viewModel.colorSelectionMethod,
-        ),
-      ),
-      Flexible(
-        child: ColorImageButton(
-          handleImageSelect: widget.viewModel.selectImage,
-          imageSelected: widget.viewModel.imageSelected,
-          colorSelectionMethod: widget.viewModel.colorSelectionMethod,
-        ),
-      ),
-    ],
-  );
+  Widget _trailingActions(ShowcaseState state, ShowcaseNotifier notifier) =>
+      Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Flexible(
+            child: ColorSeedButton(
+              handleColorSelect: notifier.selectColor,
+              colorSelected: state.colorSelected,
+              colorSelectionMethod: state.colorSelectionMethod,
+            ),
+          ),
+          Flexible(
+            child: ColorImageButton(
+              handleImageSelect: notifier.selectImage,
+              imageSelected: state.imageSelected,
+              colorSelectionMethod: state.colorSelectionMethod,
+            ),
+          ),
+        ],
+      );
 
   @override
   Widget build(BuildContext context) {
+    final state = ref.watch(showcaseNotifierProvider);
+    final notifier = ref.read(showcaseNotifierProvider.notifier);
     return AnimatedBuilder(
-      animation: Listenable.merge([controller, widget.viewModel]),
+      animation: controller,
       builder: (context, child) {
         return NavigationTransition(
           scaffoldKey: scaffoldKey,
@@ -148,33 +148,32 @@ class _ShowcaseHomeState extends State<ShowcaseHome>
           railAnimation: railAnimation,
           appBar: _createAppBar(),
           body: createScreenFor(
-            ScreenSelected.values[widget.viewModel.selectedScreenIndex],
+            ScreenSelected.values[state.selectedScreenIndex],
             controller.value == 1,
           ),
           navigationRail: NavigationRail(
             extended: showLargeSizeLayout,
             destinations: _navRailDestinations,
-            selectedIndex: widget.viewModel.selectedScreenIndex,
-            onDestinationSelected: widget.viewModel.selectScreen,
+            selectedIndex: state.selectedScreenIndex,
+            onDestinationSelected: notifier.selectScreen,
             trailing: Expanded(
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 20),
                 child: showLargeSizeLayout
                     ? ExpandedTrailingActions(
-                        handleImageSelect: widget.viewModel.selectImage,
-                        handleColorSelect: widget.viewModel.selectColor,
-                        colorSelectionMethod:
-                            widget.viewModel.colorSelectionMethod,
-                        imageSelected: widget.viewModel.imageSelected,
-                        colorSelected: widget.viewModel.colorSelected,
+                        handleImageSelect: notifier.selectImage,
+                        handleColorSelect: notifier.selectColor,
+                        colorSelectionMethod: state.colorSelectionMethod,
+                        imageSelected: state.imageSelected,
+                        colorSelected: state.colorSelected,
                       )
-                    : _trailingActions(),
+                    : _trailingActions(state, notifier),
               ),
             ),
           ),
           navigationBar: NavigationBars(
-            onSelectItem: widget.viewModel.selectScreen,
-            selectedIndex: widget.viewModel.selectedScreenIndex,
+            onSelectItem: notifier.selectScreen,
+            selectedIndex: state.selectedScreenIndex,
             isExampleBar: false,
           ),
         );

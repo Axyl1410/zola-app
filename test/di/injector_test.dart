@@ -1,68 +1,107 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:zola/data/repositories/auth_backend_repository.dart';
 import 'package:zola/data/repositories/auth_session_repository.dart';
 import 'package:zola/data/repositories/google_auth_repository.dart';
 import 'package:zola/data/repositories/showcase_theme_repository.dart';
 import 'package:zola/data/repositories/todo_repository.dart';
 import 'package:zola/data/services/api_client.dart';
+import 'package:zola/data/services/auth_remote_service.dart';
 import 'package:zola/data/services/color_scheme_service.dart';
 import 'package:zola/data/services/google_sign_in_service.dart';
 import 'package:zola/data/services/secure_storage_service.dart';
 import 'package:zola/data/services/todo_remote_service.dart';
-import 'package:zola/di/injector.dart';
-import 'package:zola/ui/features/discover/view_models/school_view_model.dart';
-import 'package:zola/ui/features/messages/view_models/messages_view_model.dart';
-import 'package:zola/ui/features/showcase/view_models/showcase_view_model.dart';
+import 'package:zola/di/providers.dart';
 
 void main() {
-  setUp(() async {
-    await sl.reset();
+  test('all providers can be resolved', () {
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+
+    expect(
+      container.read(colorSchemeServiceProvider),
+      isA<ColorSchemeService>(),
+    );
+    expect(
+      container.read(secureStorageServiceProvider),
+      isA<SecureStorageService>(),
+    );
+    expect(
+      container.read(showcaseThemeRepositoryProvider),
+      isA<ShowcaseThemeRepository>(),
+    );
+    expect(
+      container.read(authSessionRepositoryProvider),
+      isA<AuthSessionRepository>(),
+    );
+    expect(container.read(apiClientProvider), isA<ApiClient>());
+    expect(container.read(todoRemoteServiceProvider), isA<TodoRemoteService>());
+    expect(container.read(todoRepositoryProvider), isA<TodoRepository>());
+    expect(container.read(authRemoteServiceProvider), isA<AuthRemoteService>());
+    expect(
+      container.read(googleSignInServiceProvider),
+      isA<GoogleSignInService>(),
+    );
+    expect(
+      container.read(googleAuthRepositoryProvider),
+      isA<GoogleAuthRepository>(),
+    );
+    expect(
+      container.read(authBackendRepositoryProvider),
+      isA<AuthBackendRepository>(),
+    );
   });
 
-  tearDown(() async {
-    await sl.reset();
+  test('service/repository providers are singletons per container', () {
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+
+    expect(
+      identical(
+        container.read(apiClientProvider),
+        container.read(apiClientProvider),
+      ),
+      isTrue,
+    );
+    expect(
+      identical(
+        container.read(googleAuthRepositoryProvider),
+        container.read(googleAuthRepositoryProvider),
+      ),
+      isTrue,
+    );
+    expect(
+      identical(
+        container.read(authBackendRepositoryProvider),
+        container.read(authBackendRepositoryProvider),
+      ),
+      isTrue,
+    );
   });
 
-  test('setupDependencies registers all expected dependencies', () {
-    setupDependencies();
+  test('notifier providers are isolated across containers', () {
+    final containerA = ProviderContainer();
+    final containerB = ProviderContainer();
+    addTearDown(containerA.dispose);
+    addTearDown(containerB.dispose);
 
-    expect(sl.isRegistered<ColorSchemeService>(), isTrue);
-    expect(sl.isRegistered<SecureStorageService>(), isTrue);
-    expect(sl.isRegistered<ShowcaseThemeRepository>(), isTrue);
-    expect(sl.isRegistered<AuthSessionRepository>(), isTrue);
-    expect(sl.isRegistered<ApiClient>(), isTrue);
-    expect(sl.isRegistered<TodoRemoteService>(), isTrue);
-    expect(sl.isRegistered<TodoRepository>(), isTrue);
-    expect(sl.isRegistered<GoogleSignInService>(), isTrue);
-    expect(sl.isRegistered<GoogleAuthRepository>(), isTrue);
-    expect(sl.isRegistered<ShowcaseViewModel>(), isTrue);
-    expect(sl.isRegistered<SchoolViewModel>(), isTrue);
-    expect(sl.isRegistered<MessagesViewModel>(), isTrue);
-  });
+    final showcaseNotifierA = containerA.read(
+      showcaseNotifierProvider.notifier,
+    );
+    final showcaseNotifierB = containerB.read(
+      showcaseNotifierProvider.notifier,
+    );
+    final schoolNotifierA = containerA.read(schoolNotifierProvider.notifier);
+    final schoolNotifierB = containerB.read(schoolNotifierProvider.notifier);
+    final messagesNotifierA = containerA.read(
+      messagesNotifierProvider.notifier,
+    );
+    final messagesNotifierB = containerB.read(
+      messagesNotifierProvider.notifier,
+    );
 
-  test('ShowcaseViewModel is factory and services are singletons', () {
-    setupDependencies();
-
-    final viewModelA = sl<ShowcaseViewModel>();
-    final viewModelB = sl<ShowcaseViewModel>();
-    final apiClientA = sl<ApiClient>();
-    final apiClientB = sl<ApiClient>();
-
-    expect(identical(viewModelA, viewModelB), isFalse);
-    expect(identical(apiClientA, apiClientB), isTrue);
-  });
-
-  test('MessagesViewModel is factory and Google auth dependencies are singletons', () {
-    setupDependencies();
-
-    final viewModelA = sl<MessagesViewModel>();
-    final viewModelB = sl<MessagesViewModel>();
-    final repositoryA = sl<GoogleAuthRepository>();
-    final repositoryB = sl<GoogleAuthRepository>();
-    final serviceA = sl<GoogleSignInService>();
-    final serviceB = sl<GoogleSignInService>();
-
-    expect(identical(viewModelA, viewModelB), isFalse);
-    expect(identical(repositoryA, repositoryB), isTrue);
-    expect(identical(serviceA, serviceB), isTrue);
+    expect(identical(showcaseNotifierA, showcaseNotifierB), isFalse);
+    expect(identical(schoolNotifierA, schoolNotifierB), isFalse);
+    expect(identical(messagesNotifierA, messagesNotifierB), isFalse);
   });
 }

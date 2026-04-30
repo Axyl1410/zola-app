@@ -1,37 +1,48 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:zola/data/repositories/auth_session_repository.dart';
 import 'package:zola/data/repositories/todo_repository.dart';
 import 'package:zola/data/services/api_client.dart';
 import 'package:zola/data/services/secure_storage_service.dart';
 import 'package:zola/data/services/todo_remote_service.dart';
+import 'package:zola/di/providers.dart';
 import 'package:zola/domain/models/todo_item.dart';
-import 'package:zola/ui/features/discover/view_models/school_view_model.dart';
 
 void main() {
-  group('SchoolViewModel', () {
+  group('SchoolNotifier', () {
     test('loadTodo updates loading and todo on success', () async {
       final fakeRepository = _FakeTodoRepository();
-      final viewModel = SchoolViewModel(todoRepository: fakeRepository);
+      final container = ProviderContainer(
+        overrides: [todoRepositoryProvider.overrideWithValue(fakeRepository)],
+      );
+      addTearDown(container.dispose);
+      final notifier = container.read(schoolNotifierProvider.notifier);
 
-      await viewModel.loadTodo(1);
+      await notifier.loadTodo(1);
+      final state = container.read(schoolNotifierProvider);
 
       expect(fakeRepository.lastRequestedId, 1);
-      expect(viewModel.isLoading, isFalse);
-      expect(viewModel.errorMessage, isNull);
-      expect(viewModel.todo, isNotNull);
-      expect(viewModel.todo!.title, 'Todo from repository');
+      expect(state.isLoading, isFalse);
+      expect(state.errorMessage, isNull);
+      expect(state.todo, isNotNull);
+      expect(state.todo!.title, 'Todo from repository');
     });
 
     test('loadTodo sets error when repository throws', () async {
       final fakeRepository = _FakeTodoRepository(throwOnFetch: true);
-      final viewModel = SchoolViewModel(todoRepository: fakeRepository);
+      final container = ProviderContainer(
+        overrides: [todoRepositoryProvider.overrideWithValue(fakeRepository)],
+      );
+      addTearDown(container.dispose);
+      final notifier = container.read(schoolNotifierProvider.notifier);
 
-      await viewModel.loadTodo(1);
+      await notifier.loadTodo(1);
+      final state = container.read(schoolNotifierProvider);
 
-      expect(viewModel.isLoading, isFalse);
-      expect(viewModel.todo, isNull);
-      expect(viewModel.errorMessage, isNotNull);
+      expect(state.isLoading, isFalse);
+      expect(state.todo, isNull);
+      expect(state.errorMessage, isNotNull);
     });
   });
 }

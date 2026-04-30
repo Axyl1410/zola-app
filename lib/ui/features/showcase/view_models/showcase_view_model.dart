@@ -1,48 +1,67 @@
 import 'package:flutter/material.dart';
-
-import '../../../../data/repositories/showcase_theme_repository.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:zola/di/providers/repositories_providers.dart';
 import '../../../core/constants/showcase_constants.dart';
 
-class ShowcaseViewModel extends ChangeNotifier {
-  ShowcaseViewModel({required ShowcaseThemeRepository themeRepository})
-    : _themeRepository = themeRepository;
+class ShowcaseState {
+  const ShowcaseState({
+    this.colorSelected = ColorSeed.baseColor,
+    this.imageSelected = ColorImageProvider.leaves,
+    this.imageColorScheme = const ColorScheme.light(),
+    this.colorSelectionMethod = ColorSelectionMethod.colorSeed,
+    this.selectedScreenIndex = 0,
+  });
 
-  final ShowcaseThemeRepository _themeRepository;
+  final ColorSeed colorSelected;
+  final ColorImageProvider imageSelected;
+  final ColorScheme imageColorScheme;
+  final ColorSelectionMethod colorSelectionMethod;
+  final int selectedScreenIndex;
 
-  ColorSeed _colorSelected = ColorSeed.baseColor;
-  ColorImageProvider _imageSelected = ColorImageProvider.leaves;
-  ColorScheme _imageColorScheme = const ColorScheme.light();
-  ColorSelectionMethod _colorSelectionMethod = ColorSelectionMethod.colorSeed;
-  int _selectedScreenIndex = ScreenSelected.component.value;
+  ShowcaseState copyWith({
+    ColorSeed? colorSelected,
+    ColorImageProvider? imageSelected,
+    ColorScheme? imageColorScheme,
+    ColorSelectionMethod? colorSelectionMethod,
+    int? selectedScreenIndex,
+  }) {
+    return ShowcaseState(
+      colorSelected: colorSelected ?? this.colorSelected,
+      imageSelected: imageSelected ?? this.imageSelected,
+      imageColorScheme: imageColorScheme ?? this.imageColorScheme,
+      colorSelectionMethod: colorSelectionMethod ?? this.colorSelectionMethod,
+      selectedScreenIndex: selectedScreenIndex ?? this.selectedScreenIndex,
+    );
+  }
+}
 
-  ColorSeed get colorSelected => _colorSelected;
-  ColorImageProvider get imageSelected => _imageSelected;
-  ColorScheme get imageColorScheme => _imageColorScheme;
-  ColorSelectionMethod get colorSelectionMethod => _colorSelectionMethod;
-  int get selectedScreenIndex => _selectedScreenIndex;
+class ShowcaseNotifier extends Notifier<ShowcaseState> {
+  @override
+  ShowcaseState build() => const ShowcaseState();
 
   void selectColor(int value) {
-    _colorSelectionMethod = ColorSelectionMethod.colorSeed;
-    _colorSelected = ColorSeed.values[value];
-    notifyListeners();
+    state = state.copyWith(
+      colorSelectionMethod: ColorSelectionMethod.colorSeed,
+      colorSelected: ColorSeed.values[value],
+    );
   }
 
   Future<void> selectImage(int value) async {
     final image = ColorImageProvider.values[value];
-    final newScheme = await _themeRepository.getColorSchemeFromImageUrl(
-      image.url,
+    final newScheme = await ref
+        .read(showcaseThemeRepositoryProvider)
+        .getColorSchemeFromImageUrl(image.url);
+    state = state.copyWith(
+      colorSelectionMethod: ColorSelectionMethod.image,
+      imageSelected: image,
+      imageColorScheme: newScheme,
     );
-    _colorSelectionMethod = ColorSelectionMethod.image;
-    _imageSelected = image;
-    _imageColorScheme = newScheme;
-    notifyListeners();
   }
 
   void selectScreen(int index) {
-    if (_selectedScreenIndex == index) {
+    if (state.selectedScreenIndex == index) {
       return;
     }
-    _selectedScreenIndex = index;
-    notifyListeners();
+    state = state.copyWith(selectedScreenIndex: index);
   }
 }

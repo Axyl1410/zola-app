@@ -1,57 +1,50 @@
 import 'package:flutter/material.dart';
-import 'package:zola/di/injector.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zola/ui/core/widgets/default_home_app_bar.dart';
+import 'package:zola/ui/features/discover/view_models/school_providers.dart';
 import 'package:zola/ui/features/discover/view_models/school_view_model.dart';
 
-class DiscoverScreen extends StatefulWidget {
+class DiscoverScreen extends ConsumerStatefulWidget {
   const DiscoverScreen({super.key});
 
   @override
-  State<DiscoverScreen> createState() => _DiscoverScreenState();
+  ConsumerState<DiscoverScreen> createState() => _DiscoverScreenState();
 }
 
-class _DiscoverScreenState extends State<DiscoverScreen> {
-  late final SchoolViewModel _viewModel;
-
+class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
   @override
   void initState() {
     super.initState();
-    _viewModel = sl<SchoolViewModel>();
-    _viewModel.loadTodo(1);
-  }
-
-  @override
-  void dispose() {
-    _viewModel.dispose();
-    super.dispose();
+    Future.microtask(
+      () => ref.read(schoolNotifierProvider.notifier).loadTodo(1),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final state = ref.watch(schoolNotifierProvider);
+    final notifier = ref.read(schoolNotifierProvider.notifier);
     return Scaffold(
       appBar: buildDefaultHomeAppBar(title: 'Khám phá dịch vụ'),
-      body: ListenableBuilder(
-        listenable: _viewModel,
-        builder: (context, _) => _buildBody(),
-      ),
+      body: _buildBody(state, notifier),
     );
   }
 
-  Widget _buildBody() {
-    if (_viewModel.isLoading) {
+  Widget _buildBody(SchoolState state, SchoolNotifier notifier) {
+    if (state.isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
 
-    if (_viewModel.errorMessage != null) {
+    if (state.errorMessage != null) {
       return RefreshIndicator(
-        onRefresh: () => _viewModel.loadTodo(1),
+        onRefresh: () => notifier.loadTodo(1),
         child: ListView(
           physics: const AlwaysScrollableScrollPhysics(),
           children: <Widget>[
             Padding(
               padding: const EdgeInsets.all(24),
               child: Text(
-                'Error: ${_viewModel.errorMessage}\n\nPull down to retry.',
+                'Error: ${state.errorMessage}\n\nPull down to retry.',
                 textAlign: TextAlign.center,
               ),
             ),
@@ -60,10 +53,10 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
       );
     }
 
-    final todo = _viewModel.todo;
+    final todo = state.todo;
     if (todo == null) {
       return RefreshIndicator(
-        onRefresh: () => _viewModel.loadTodo(1),
+        onRefresh: () => notifier.loadTodo(1),
         child: ListView(
           physics: const AlwaysScrollableScrollPhysics(),
           children: <Widget>[
@@ -80,7 +73,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     }
 
     return RefreshIndicator(
-      onRefresh: () => _viewModel.loadTodo(1),
+      onRefresh: () => notifier.loadTodo(1),
       child: ListView(
         physics: const AlwaysScrollableScrollPhysics(),
         children: <Widget>[
@@ -97,7 +90,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                   Text('title: ${todo.title}'),
                   Text('completed: ${todo.completed}'),
                   TextButton(
-                    onPressed: () => _viewModel.loadTodo(1),
+                    onPressed: () => notifier.loadTodo(1),
                     child: const Text('reload'),
                   ),
                   const Text(
