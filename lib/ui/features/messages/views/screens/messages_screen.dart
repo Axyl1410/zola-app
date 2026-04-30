@@ -76,7 +76,6 @@ class _MessagesScreenState extends State<MessagesScreen> {
 
   void _logAuthResult(GoogleAuthResult authResult) {
     debugPrint('========== GOOGLE_LOGIN_SUCCESS ==========');
-    debugPrint('email: ${authResult.email}');
     debugPrint('idToken: ${authResult.idToken ?? "null"}');
     debugPrint('accessToken: ${authResult.accessToken}');
     debugPrint('==========================================');

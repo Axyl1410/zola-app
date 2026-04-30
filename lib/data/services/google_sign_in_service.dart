@@ -29,7 +29,6 @@ class GoogleSignInService {
         .authorizeScopes(<String>['openid', 'email', 'profile']);
 
     return GoogleSignInTokensModel(
-      email: user.email,
       idToken: auth.idToken,
       accessToken: authorization.accessToken,
     );

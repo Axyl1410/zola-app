@@ -10,7 +10,6 @@ class GoogleAuthRepository {
   Future<GoogleAuthResult> signInWithGoogle() async {
     final signInResult = await _googleSignInService.signIn();
     return GoogleAuthResult(
-      email: signInResult.email,
       idToken: signInResult.idToken,
       accessToken: signInResult.accessToken,
     );
