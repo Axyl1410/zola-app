@@ -6,10 +6,6 @@ import 'package:zola/ui/features/auth/view_models/auth_status_providers.dart';
 import 'package:zola/ui/features/auth/view_models/auth_status_view_model.dart';
 import 'package:zola/ui/features/auth/views/login_view.dart';
 import 'package:zola/ui/features/home/views/home_view.dart';
-import 'package:zola/ui/features/showcase/view_models/showcase_providers.dart';
-
-import 'ui/core/constants/showcase_constants.dart';
-import 'ui/features/showcase/view_models/showcase_view_model.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -54,16 +50,13 @@ class _AppState extends ConsumerState<App> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(showcaseNotifierProvider);
     final authStatus = ref.watch(authStatusNotifierProvider);
     return MaterialApp(
       key: ValueKey<AuthStatus>(authStatus),
       debugShowCheckedModeBanner: false,
       title: 'Zola',
       themeMode: _themeMode,
-      theme: _buildLightTheme(state),
-      // darkTheme: _buildDarkTheme(),
-      // home: ShowcaseHome(useMaterial3: _useMaterial3),
+      theme: _buildLightTheme(),
       home: switch (authStatus) {
         AuthStatus.checking => const _AuthLoadingView(),
         AuthStatus.authenticated => const HomeView(),
@@ -72,18 +65,8 @@ class _AppState extends ConsumerState<App> with WidgetsBindingObserver {
     );
   }
 
-  ThemeData _buildLightTheme(ShowcaseState state) {
-    return ThemeData(
-      colorSchemeSeed:
-          state.colorSelectionMethod == ColorSelectionMethod.colorSeed
-          ? state.colorSelected.color
-          : null,
-      colorScheme: state.colorSelectionMethod == ColorSelectionMethod.image
-          ? state.imageColorScheme
-          : null,
-      useMaterial3: _useMaterial3,
-      brightness: Brightness.light,
-    );
+  ThemeData _buildLightTheme() {
+    return ThemeData(useMaterial3: _useMaterial3, brightness: Brightness.light);
   }
 
   // ThemeData _buildDarkTheme() {
