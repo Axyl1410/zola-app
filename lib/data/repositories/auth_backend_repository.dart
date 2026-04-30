@@ -25,6 +25,10 @@ class AuthBackendRepository {
       body: response.body,
     );
   }
+
+  Future<void> signOut({required String bearerToken}) async {
+    await _authRemoteService.signOut(bearerToken: bearerToken);
+  }
 }
 
 class AuthBackendSignInResult {

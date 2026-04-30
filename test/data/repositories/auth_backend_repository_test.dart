@@ -56,6 +56,16 @@ void main() {
       expect(result.statusCode, 201);
       expect(result.body, '{"ok":true}');
     });
+
+    test('delegates signOut token to remote service', () async {
+      final fakeService = _FakeAuthRemoteService();
+      final repository = AuthBackendRepository(authRemoteService: fakeService);
+
+      await repository.signOut(bearerToken: 'secret-token');
+
+      expect(fakeService.signOutCalled, isTrue);
+      expect(fakeService.lastBearerToken, 'secret-token');
+    });
   });
 }
 
@@ -68,8 +78,10 @@ class _FakeAuthRemoteService extends AuthRemoteService {
       );
 
   bool called = false;
+  bool signOutCalled = false;
   String? lastIdToken;
   String? lastAccessToken;
+  String? lastBearerToken;
 
   @override
   Future<http.Response> signInWithGoogle({
@@ -80,6 +92,13 @@ class _FakeAuthRemoteService extends AuthRemoteService {
     lastIdToken = idToken;
     lastAccessToken = accessToken;
     return http.Response('{"ok":true}', 201);
+  }
+
+  @override
+  Future<http.Response> signOut({required String bearerToken}) async {
+    signOutCalled = true;
+    lastBearerToken = bearerToken;
+    return http.Response('{}', 200);
   }
 }
 

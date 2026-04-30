@@ -6,6 +6,8 @@ class AuthRemoteService {
   AuthRemoteService({required ApiClient apiClient}) : _apiClient = apiClient;
 
   final ApiClient _apiClient;
+  static const _signOutUrl =
+      'https://zola.truonggiang-axyl.workers.dev/api/auth/sign-out';
 
   Future<http.Response> signInWithGoogle({
     required String idToken,
@@ -20,6 +22,14 @@ class AuthRemoteService {
           'accessToken': accessToken,
         },
       },
+    );
+  }
+
+  Future<http.Response> signOut({required String bearerToken}) {
+    return _apiClient.post(
+      Uri.parse(_signOutUrl),
+      headers: <String, String>{'Authorization': 'Bearer $bearerToken'},
+      body: <String, dynamic>{},
     );
   }
 }
