@@ -6,8 +6,8 @@ class FullScreenPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Full Screen')),
-      body: const Center(child: Text('Screen mới hoàn toàn')),
+      appBar: AppBar(title: const Text('Toàn màn hình')),
+      body: const Center(child: Text('Màn hình mới hoàn toàn')),
     );
   }
 }

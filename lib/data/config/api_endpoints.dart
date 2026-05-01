@@ -19,4 +19,8 @@ class ApiEndpoints {
   static Uri authSignOut() {
     return _buildBackend('/api/auth/sign-out');
   }
+
+  static Uri authGetSession() {
+    return _buildBackend('/api/auth/get-session');
+  }
 }

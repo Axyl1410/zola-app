@@ -22,7 +22,7 @@ void main() {
     test('signInWithGoogle saves backend token and succeeds', () async {
       final fakeGoogleRepo = _FakeGoogleAuthRepository();
       final fakeBackendRepo = _FakeAuthBackendRepository(
-        responseBody: '{"token":"backend-jwt"}',
+        shouldThrowMissingToken: false,
       );
       final container = ProviderContainer(
         overrides: [
@@ -52,7 +52,7 @@ void main() {
             _FakeGoogleAuthRepository(),
           ),
           authBackendRepositoryProvider.overrideWithValue(
-            _FakeAuthBackendRepository(responseBody: '{"ok":true}'),
+            _FakeAuthBackendRepository(shouldThrowMissingToken: true),
           ),
           authStatusNotifierProvider.overrideWith(_FakeAuthStatusNotifier.new),
         ],
@@ -92,10 +92,10 @@ class _NoopGoogleSignInService extends GoogleSignInService {
 }
 
 class _FakeAuthBackendRepository extends AuthBackendRepository {
-  _FakeAuthBackendRepository({required this.responseBody})
+  _FakeAuthBackendRepository({required this.shouldThrowMissingToken})
     : super(authRemoteService: _NoopAuthRemoteService());
 
-  final String responseBody;
+  final bool shouldThrowMissingToken;
   bool called = false;
 
   @override
@@ -103,7 +103,10 @@ class _FakeAuthBackendRepository extends AuthBackendRepository {
     GoogleAuthResult authResult,
   ) async {
     called = true;
-    return AuthBackendSignInResult(statusCode: 200, body: responseBody);
+    if (shouldThrowMissingToken) {
+      throw Exception('Backend response missing token');
+    }
+    return const AuthBackendSignInResult(statusCode: 200, token: 'backend-jwt');
   }
 }
 

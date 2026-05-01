@@ -15,7 +15,7 @@ class ContactsScreen extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             const Text(
-              'Danh ba',
+              'Danh bạ',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             TextButton(
@@ -24,7 +24,7 @@ class ContactsScreen extends StatelessWidget {
                   MaterialPageRoute(builder: (_) => const FullScreenPage()),
                 );
               },
-              child: const Text('Open full screen'),
+              child: const Text('Mở toàn màn hình'),
             ),
           ],
         ),

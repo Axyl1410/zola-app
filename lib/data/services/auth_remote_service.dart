@@ -30,4 +30,11 @@ class AuthRemoteService {
       body: <String, dynamic>{},
     );
   }
+
+  Future<http.Response> getSession({required String bearerToken}) {
+    return _apiClient.get(
+      ApiEndpoints.authGetSession(),
+      headers: <String, String>{'Authorization': 'Bearer $bearerToken'},
+    );
+  }
 }

@@ -46,7 +46,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               const Text(
-                'Login to your account',
+                'Đăng nhập vào tài khoản',
                 style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.w700,
@@ -78,7 +78,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
                 enabled: false,
                 obscureText: !_passwordVisible,
                 decoration: InputDecoration(
-                  hintText: 'Password',
+                  hintText: 'Mật khẩu',
                   border: const OutlineInputBorder(),
                   suffixIcon: IconButton(
                     icon: Icon(
@@ -104,7 +104,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text(
-                                'Email/password login will be added next.',
+                                'Đăng nhập email/mật khẩu sẽ được thêm sau.',
                               ),
                             ),
                           );
@@ -114,13 +114,13 @@ class _LoginViewState extends ConsumerState<LoginView> {
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                   ),
-                  child: const Text('Login'),
+                  child: const Text('Đăng nhập'),
                 ),
               ),
               const SizedBox(height: 24),
               const Center(
                 child: Text(
-                  'OR',
+                  'HOẶC',
                   style: TextStyle(
                     color: Colors.black54,
                     fontWeight: FontWeight.w600,
@@ -138,7 +138,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
                     padding: const EdgeInsets.symmetric(vertical: 14),
                   ),
                   child: Text(
-                    state.isLoading ? 'Logging in...' : 'Login with Google',
+                    state.isLoading ? 'Đang đăng nhập...' : 'Đăng nhập với Google',
                   ),
                 ),
               ),
@@ -146,11 +146,11 @@ class _LoginViewState extends ConsumerState<LoginView> {
               Center(
                 child: RichText(
                   text: const TextSpan(
-                    text: "Don't have an account? ",
+                    text: 'Chưa có tài khoản? ',
                     style: TextStyle(color: Colors.black54, fontSize: 16),
                     children: <TextSpan>[
                       TextSpan(
-                        text: 'Register',
+                        text: 'Đăng ký',
                         style: TextStyle(
                           color: Colors.lightBlue,
                           fontWeight: FontWeight.w600,

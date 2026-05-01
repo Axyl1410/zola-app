@@ -54,7 +54,9 @@ void main() {
       expect(fakeService.lastIdToken, 'id-token');
       expect(fakeService.lastAccessToken, 'access-token');
       expect(result.statusCode, 201);
-      expect(result.body, '{"ok":true}');
+      expect(result.token, 'backend-jwt');
+      expect(result.user, isNotNull);
+      expect(result.user!.email, 'dev@zola.app');
     });
 
     test('delegates signOut token to remote service', () async {
@@ -66,11 +68,54 @@ void main() {
       expect(fakeService.signOutCalled, isTrue);
       expect(fakeService.lastBearerToken, 'secret-token');
     });
+
+    test('throws backend message for 4xx/5xx responses', () async {
+      final fakeService = _FakeAuthRemoteService(
+        signInResponse: http.Response('{"message":"Unauthorized"}', 401),
+      );
+      final repository = AuthBackendRepository(authRemoteService: fakeService);
+      const authResult = GoogleAuthResult(
+        idToken: 'id-token',
+        accessToken: 'access-token',
+      );
+
+      await expectLater(
+        () => repository.signInWithGoogle(authResult),
+        throwsA(
+          isA<Exception>().having(
+            (e) => e.toString(),
+            'message',
+            contains('Unauthorized'),
+          ),
+        ),
+      );
+    });
+
+    test('signOut throws backend message for 4xx/5xx responses', () async {
+      final fakeService = _FakeAuthRemoteService(
+        signOutResponse: http.Response('{"message":"Session expired"}', 401),
+      );
+      final repository = AuthBackendRepository(authRemoteService: fakeService);
+
+      await expectLater(
+        () => repository.signOut(bearerToken: 'secret-token'),
+        throwsA(
+          isA<Exception>().having(
+            (e) => e.toString(),
+            'message',
+            contains('Session expired'),
+          ),
+        ),
+      );
+    });
   });
 }
 
 class _FakeAuthRemoteService extends AuthRemoteService {
-  _FakeAuthRemoteService()
+  _FakeAuthRemoteService({
+    this.signInResponse,
+    this.signOutResponse,
+  })
     : super(
         apiClient: ApiClient(
           authSessionRepository: _FakeAuthSessionRepository(),
@@ -82,6 +127,8 @@ class _FakeAuthRemoteService extends AuthRemoteService {
   String? lastIdToken;
   String? lastAccessToken;
   String? lastBearerToken;
+  final http.Response? signInResponse;
+  final http.Response? signOutResponse;
 
   @override
   Future<http.Response> signInWithGoogle({
@@ -91,14 +138,18 @@ class _FakeAuthRemoteService extends AuthRemoteService {
     called = true;
     lastIdToken = idToken;
     lastAccessToken = accessToken;
-    return http.Response('{"ok":true}', 201);
+    return signInResponse ??
+        http.Response(
+      '{"token":"backend-jwt","user":{"id":"u_1","name":"Dev","email":"dev@zola.app","emailVerified":true}}',
+      201,
+    );
   }
 
   @override
   Future<http.Response> signOut({required String bearerToken}) async {
     signOutCalled = true;
     lastBearerToken = bearerToken;
-    return http.Response('{}', 200);
+    return signOutResponse ?? http.Response('{}', 200);
   }
 }
 

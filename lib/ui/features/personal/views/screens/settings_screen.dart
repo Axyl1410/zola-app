@@ -6,7 +6,7 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Full Screen')),
+      appBar: AppBar(title: const Text('Cài đặt')),
       body: Container(
         color: Colors.white,
         padding: const EdgeInsets.all(16),

@@ -44,7 +44,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
             Padding(
               padding: const EdgeInsets.all(24),
               child: Text(
-                'Error: ${state.errorMessage}\n\nPull down to retry.',
+                'Lỗi: ${state.errorMessage}\n\nKéo xuống để thử lại.',
                 textAlign: TextAlign.center,
               ),
             ),
@@ -63,7 +63,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
             Padding(
               padding: const EdgeInsets.all(24),
               child: Text(
-                'No data\n\nPull down to refresh.',
+                'Không có dữ liệu\n\nKéo xuống để làm mới.',
                 textAlign: TextAlign.center,
               ),
             ),
@@ -85,16 +85,16 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Text('userId: ${todo.userId}'),
-                  Text('id: ${todo.id}'),
-                  Text('title: ${todo.title}'),
-                  Text('completed: ${todo.completed}'),
+                  Text('Mã người dùng: ${todo.userId}'),
+                  Text('Mã công việc: ${todo.id}'),
+                  Text('Tiêu đề: ${todo.title}'),
+                  Text('Hoàn thành: ${todo.completed}'),
                   TextButton(
                     onPressed: () => notifier.loadTodo(1),
-                    child: const Text('reload'),
+                    child: const Text('Tải lại'),
                   ),
                   const Text(
-                    'Pull down anywhere to refresh.',
+                    'Bạn có thể kéo xuống ở bất kỳ đâu để làm mới.',
                     style: TextStyle(color: Colors.grey),
                   ),
                 ],
