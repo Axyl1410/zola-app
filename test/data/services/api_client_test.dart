@@ -1,13 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
-import 'package:zola/data/repositories/auth_session_repository.dart';
 import 'package:zola/data/services/api_client.dart';
-import 'package:zola/data/services/secure_storage_service.dart';
+import 'package:zola/data/services/auth_token_provider.dart';
 
 void main() {
   group('ApiClient', () {
@@ -17,11 +15,11 @@ void main() {
         capturedRequest = request;
         return http.Response('{}', 200);
       });
-      final authRepository = _FakeAuthSessionRepository(
+      final authRepository = _FakeAuthTokenProvider(
         tokenToReturn: 'abc-token',
       );
       final apiClient = ApiClient(
-        authSessionRepository: authRepository,
+        authTokenProvider: authRepository,
         httpClient: mockClient,
       );
 
@@ -40,9 +38,9 @@ void main() {
         capturedRequest = request;
         return http.Response('{}', 200);
       });
-      final authRepository = _FakeAuthSessionRepository(tokenToReturn: null);
+      final authRepository = _FakeAuthTokenProvider(tokenToReturn: null);
       final apiClient = ApiClient(
-        authSessionRepository: authRepository,
+        authTokenProvider: authRepository,
         httpClient: mockClient,
       );
 
@@ -61,11 +59,11 @@ void main() {
         capturedRequest = request;
         return http.Response('{}', 201);
       });
-      final authRepository = _FakeAuthSessionRepository(
+      final authRepository = _FakeAuthTokenProvider(
         tokenToReturn: 'post-token',
       );
       final apiClient = ApiClient(
-        authSessionRepository: authRepository,
+        authTokenProvider: authRepository,
         httpClient: mockClient,
       );
 
@@ -92,9 +90,9 @@ void main() {
         capturedRequest = request;
         return http.Response('{}', 200);
       });
-      final authRepository = _FakeAuthSessionRepository(tokenToReturn: null);
+      final authRepository = _FakeAuthTokenProvider(tokenToReturn: null);
       final apiClient = ApiClient(
-        authSessionRepository: authRepository,
+        authTokenProvider: authRepository,
         httpClient: mockClient,
       );
 
@@ -115,9 +113,8 @@ void main() {
   });
 }
 
-class _FakeAuthSessionRepository extends AuthSessionRepository {
-  _FakeAuthSessionRepository({required this.tokenToReturn})
-    : super(secureStorageService: _FakeSecureStorageService());
+class _FakeAuthTokenProvider implements AuthTokenProvider {
+  _FakeAuthTokenProvider({required this.tokenToReturn});
 
   final String? tokenToReturn;
 
@@ -125,8 +122,4 @@ class _FakeAuthSessionRepository extends AuthSessionRepository {
   Future<String?> getValidToken() async {
     return tokenToReturn;
   }
-}
-
-class _FakeSecureStorageService extends SecureStorageService {
-  _FakeSecureStorageService() : super(storage: const FlutterSecureStorage());
 }

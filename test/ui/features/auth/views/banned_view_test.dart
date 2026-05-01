@@ -74,7 +74,7 @@ class _FakeAuthStatusNotifier extends AuthStatusNotifier {
   Future<void> onAppResumed() async {}
 
   @override
-  Future<void> logout() async {
+  Future<void> logout({bool notifyBackend = true}) async {
     logoutCalled = true;
     state = AuthStatus.unauthenticated;
   }

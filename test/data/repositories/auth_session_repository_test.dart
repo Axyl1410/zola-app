@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:zola/data/repositories/auth_session_repository.dart';
 import 'package:zola/data/services/secure_storage_service.dart';
 import 'package:zola/domain/models/auth_session.dart';
+import 'package:zola/domain/models/auth_user.dart';
 
 void main() {
   group('AuthSessionRepository', () {
@@ -14,15 +15,47 @@ void main() {
       repository = AuthSessionRepository(secureStorageService: fakeService);
     });
 
-    test('saveToken delegates token and ttl to service', () async {
+    test('saveToken persists token and computes expiry from ttl', () async {
       const ttl = Duration(hours: 4);
+      final beforeCall = DateTime.now().toUtc();
 
       final result = await repository.saveToken('repo-token', ttl: ttl);
 
-      expect(fakeService.saveTokenCalls, 1);
-      expect(fakeService.lastSavedToken, 'repo-token');
-      expect(fakeService.lastSavedTtl, ttl);
+      final afterCall = DateTime.now().toUtc();
       expect(result.token, 'repo-token');
+      expect(result.expiresAt.difference(result.receivedAt), ttl);
+      expect(fakeService.storage['auth.token'], 'repo-token');
+      expect(fakeService.storage['auth.receivedAt'], result.receivedAt.toIso8601String());
+      expect(fakeService.storage['auth.expiresAt'], result.expiresAt.toIso8601String());
+      expect(result.receivedAt.isAfter(beforeCall) || result.receivedAt.isAtSameMomentAs(beforeCall), isTrue);
+      expect(result.receivedAt.isBefore(afterCall) || result.receivedAt.isAtSameMomentAs(afterCall), isTrue);
+    });
+
+    test('saveToken uses repository default ttl when omitted', () async {
+      final result = await repository.saveToken('repo-token');
+
+      expect(
+        result.expiresAt.difference(result.receivedAt),
+        AuthSessionRepository.defaultSessionTtl,
+      );
+      expect(result.token, 'repo-token');
+    });
+
+    test('saveSession delegates token and expiry to service', () async {
+      final expiresAt = DateTime.utc(2026, 5, 3, 0, 0, 0);
+      final receivedAt = DateTime.utc(2026, 5, 1, 0, 0, 0);
+
+      final result = await repository.saveSession(
+        token: 'server-token',
+        expiresAt: expiresAt,
+        receivedAt: receivedAt,
+      );
+
+      expect(fakeService.storage['auth.token'], 'server-token');
+      expect(fakeService.storage['auth.receivedAt'], receivedAt.toIso8601String());
+      expect(fakeService.storage['auth.expiresAt'], expiresAt.toIso8601String());
+      expect(result.token, 'server-token');
+      expect(result.expiresAt, expiresAt);
     });
 
     test('getSession delegates and returns service result', () async {
@@ -31,27 +64,108 @@ void main() {
         receivedAt: DateTime.utc(2026, 3, 1),
         expiresAt: DateTime.utc(2026, 3, 8),
       );
-      fakeService.sessionToReturn = expected;
+      fakeService.storage['auth.token'] = expected.token;
+      fakeService.storage['auth.receivedAt'] = expected.receivedAt.toIso8601String();
+      fakeService.storage['auth.expiresAt'] = expected.expiresAt.toIso8601String();
 
       final result = await repository.getSession();
 
-      expect(fakeService.getSessionCalls, 1);
-      expect(result, expected);
+      expect(result, isNotNull);
+      expect(result!.token, expected.token);
+      expect(result.receivedAt, expected.receivedAt);
+      expect(result.expiresAt, expected.expiresAt);
     });
 
-    test('getValidToken delegates and returns service token', () async {
-      fakeService.validTokenToReturn = 'valid-token';
+    test('getValidToken returns token when session is not expired', () async {
+      final now = DateTime.now().toUtc();
+      fakeService.storage['auth.token'] = 'valid-token';
+      fakeService.storage['auth.receivedAt'] =
+          now.subtract(const Duration(minutes: 5)).toIso8601String();
+      fakeService.storage['auth.expiresAt'] =
+          now.add(const Duration(minutes: 5)).toIso8601String();
 
       final result = await repository.getValidToken();
 
-      expect(fakeService.getValidTokenCalls, 1);
       expect(result, 'valid-token');
     });
 
-    test('clearSession delegates to service', () async {
+    test('getValidToken clears expired session', () async {
+      final now = DateTime.now().toUtc();
+      fakeService.storage['auth.token'] = 'expired-token';
+      fakeService.storage['auth.receivedAt'] =
+          now.subtract(const Duration(days: 2)).toIso8601String();
+      fakeService.storage['auth.expiresAt'] =
+          now.subtract(const Duration(days: 1)).toIso8601String();
+
+      final result = await repository.getValidToken();
+
+      expect(result, isNull);
+      expect(fakeService.storage.containsKey('auth.token'), isFalse);
+      expect(fakeService.storage.containsKey('auth.receivedAt'), isFalse);
+      expect(fakeService.storage.containsKey('auth.expiresAt'), isFalse);
+      expect(fakeService.storage.containsKey('auth.user'), isFalse);
+    });
+
+    test('saveUser/getUser roundtrip and clearUser works', () async {
+      const user = AuthUser(
+        id: 'u_1',
+        name: 'Test User',
+        email: 'test@zola.app',
+        emailVerified: true,
+      );
+
+      await repository.saveUser(user);
+      final loaded = await repository.getUser();
+      expect(loaded?.id, user.id);
+      expect(loaded?.email, user.email);
+
+      await repository.clearUser();
+      expect(await repository.getUser(), isNull);
+    });
+
+    test('getUser returns null for corrupted user json', () async {
+      fakeService.storage['auth.user'] = '{bad json';
+      expect(await repository.getUser(), isNull);
+    });
+
+    test('getUser returns null for non-map user json', () async {
+      fakeService.storage['auth.user'] = '["x"]';
+      expect(await repository.getUser(), isNull);
+    });
+
+    test('getSession returns null for corrupted session fields', () async {
+      fakeService.storage['auth.token'] = 'token-123';
+      fakeService.storage['auth.receivedAt'] = 'not-a-date';
+      fakeService.storage['auth.expiresAt'] = 'also-not-a-date';
+
+      final session = await repository.getSession();
+      expect(session, isNull);
+    });
+
+    test('getValidToken fails safe for corrupted session fields', () async {
+      fakeService.storage['auth.token'] = 'token-123';
+      fakeService.storage['auth.receivedAt'] = 'broken';
+      fakeService.storage['auth.expiresAt'] = 'broken';
+      fakeService.storage['auth.user'] = '{"id":"u_1"}';
+
+      final token = await repository.getValidToken();
+
+      expect(token, isNull);
+      expect(fakeService.storage.containsKey('auth.token'), isFalse);
+      expect(fakeService.storage.containsKey('auth.receivedAt'), isFalse);
+      expect(fakeService.storage.containsKey('auth.expiresAt'), isFalse);
+      expect(fakeService.storage.containsKey('auth.user'), isFalse);
+    });
+
+    test('clearSession deletes auth and user fields', () async {
+      fakeService.storage['auth.token'] = 'x';
+      fakeService.storage['auth.receivedAt'] = 'y';
+      fakeService.storage['auth.expiresAt'] = 'z';
+      fakeService.storage['auth.user'] = '{}';
+
       await repository.clearSession();
 
-      expect(fakeService.clearSessionCalls, 1);
+      expect(fakeService.storage, isEmpty);
     });
   });
 }
@@ -59,45 +173,25 @@ void main() {
 class _FakeSecureStorageService extends SecureStorageService {
   _FakeSecureStorageService() : super(storage: const FlutterSecureStorage());
 
-  int saveTokenCalls = 0;
-  int getSessionCalls = 0;
-  int getValidTokenCalls = 0;
-  int clearSessionCalls = 0;
-
-  String? lastSavedToken;
-  Duration? lastSavedTtl;
-  AuthSession? sessionToReturn;
-  String? validTokenToReturn;
+  final Map<String, String> storage = <String, String>{};
 
   @override
-  Future<AuthSession> saveSessionToken(
-    String token, {
-    Duration ttl = SecureStorageService.defaultSessionTtl,
-  }) async {
-    saveTokenCalls++;
-    lastSavedToken = token;
-    lastSavedTtl = ttl;
-    return AuthSession(
-      token: token,
-      receivedAt: DateTime.utc(2026, 1, 1),
-      expiresAt: DateTime.utc(2026, 1, 1).add(ttl),
-    );
+  Future<void> writeValue({required String key, required String value}) async {
+    storage[key] = value;
   }
 
   @override
-  Future<AuthSession?> getSession() async {
-    getSessionCalls++;
-    return sessionToReturn;
+  Future<String?> readValue(String key) async {
+    return storage[key];
   }
 
   @override
-  Future<String?> getValidToken() async {
-    getValidTokenCalls++;
-    return validTokenToReturn;
+  Future<void> deleteValue(String key) async {
+    storage.remove(key);
   }
 
   @override
-  Future<void> clearSession() async {
-    clearSessionCalls++;
+  Future<Map<String, String>> readAll() async {
+    return Map<String, String>.from(storage);
   }
 }

@@ -2,16 +2,16 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
-import 'package:zola/data/repositories/auth_session_repository.dart';
+import 'package:zola/data/services/auth_token_provider.dart';
 
 class ApiClient {
   ApiClient({
-    required AuthSessionRepository authSessionRepository,
+    required AuthTokenProvider authTokenProvider,
     http.Client? httpClient,
-  }) : _authSessionRepository = authSessionRepository,
+  }) : _authTokenProvider = authTokenProvider,
        _httpClient = httpClient ?? http.Client();
 
-  final AuthSessionRepository _authSessionRepository;
+  final AuthTokenProvider _authTokenProvider;
   final http.Client _httpClient;
 
   Future<http.Response> get(Uri uri, {Map<String, String>? headers}) async {
@@ -64,7 +64,7 @@ class ApiClient {
       mergedHeaders[HttpHeaders.contentTypeHeader] = 'application/json';
     }
 
-    final token = await _authSessionRepository.getValidToken();
+    final token = await _authTokenProvider.getValidToken();
     if (token != null && token.isNotEmpty) {
       mergedHeaders[HttpHeaders.authorizationHeader] = 'Bearer $token';
     }

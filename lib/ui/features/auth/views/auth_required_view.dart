@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zola/ui/features/auth/view_models/auth_status_providers.dart';
-import 'package:zola/ui/features/auth/views/login_view.dart';
 
 class AuthRequiredView extends ConsumerWidget {
   const AuthRequiredView({super.key});
@@ -23,7 +22,7 @@ class AuthRequiredView extends ConsumerWidget {
               ),
               const SizedBox(height: 16),
               const Text(
-                'Phiên đăng nhập đã hết hạn',
+                'Không thể xác thực phiên',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.w700,
@@ -33,7 +32,7 @@ class AuthRequiredView extends ConsumerWidget {
               ),
               const SizedBox(height: 10),
               const Text(
-                'Để tiếp tục sử dụng ứng dụng,\nvui lòng đăng nhập lại.',
+                'Kết nối mạng đang không ổn định.\nVui lòng thử kiểm tra lại phiên.',
                 style: TextStyle(fontSize: 16, color: Colors.black54),
                 textAlign: TextAlign.center,
               ),
@@ -41,12 +40,10 @@ class AuthRequiredView extends ConsumerWidget {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).pushReplacement(
-                      MaterialPageRoute<void>(
-                        builder: (_) => const LoginView(),
-                      ),
-                    );
+                  onPressed: () async {
+                    await ref
+                        .read(authStatusNotifierProvider.notifier)
+                        .logout(notifyBackend: false);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.lightBlue,

@@ -112,13 +112,10 @@ void main() {
 }
 
 class _FakeAuthRemoteService extends AuthRemoteService {
-  _FakeAuthRemoteService({
-    this.signInResponse,
-    this.signOutResponse,
-  })
+  _FakeAuthRemoteService({this.signInResponse, this.signOutResponse})
     : super(
         apiClient: ApiClient(
-          authSessionRepository: _FakeAuthSessionRepository(),
+          authTokenProvider: _FakeAuthSessionRepository(),
         ),
       );
 
@@ -140,9 +137,9 @@ class _FakeAuthRemoteService extends AuthRemoteService {
     lastAccessToken = accessToken;
     return signInResponse ??
         http.Response(
-      '{"token":"backend-jwt","user":{"id":"u_1","name":"Dev","email":"dev@zola.app","emailVerified":true}}',
-      201,
-    );
+          '{"token":"backend-jwt","user":{"id":"u_1","name":"Dev","email":"dev@zola.app","emailVerified":true}}',
+          201,
+        );
   }
 
   @override

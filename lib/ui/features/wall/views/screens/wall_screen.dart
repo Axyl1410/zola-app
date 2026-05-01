@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:zola/ui/core/widgets/default_home_app_bar.dart';
+import 'package:zola/ui/features/auth/view_models/current_user_provider.dart';
 
 class WallScreen extends StatefulWidget {
   const WallScreen({super.key});
@@ -30,18 +32,34 @@ class _WallScreenState extends State<WallScreen> {
             children: <Widget>[
               Row(
                 children: <Widget>[
-                  Container(
-                    height: 50,
-                    width: 50,
-                    decoration: const BoxDecoration(
-                      image: DecorationImage(
-                        image: NetworkImage(
-                          'https://images.unsplash.com/photo-1774050952646-a850ad28ad6f?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+                  Consumer(
+                    builder: (context, ref, child) {
+                      final user = ref
+                          .watch(currentUserProvider)
+                          .maybeWhen(
+                            data: (value) => value,
+                            orElse: () => null,
+                          );
+                      final imageUrl = user?.image?.trim();
+                      final hasImage = imageUrl != null && imageUrl.isNotEmpty;
+                      return Container(
+                        height: 50,
+                        width: 50,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade200,
+                          image: hasImage
+                              ? DecorationImage(
+                                  image: NetworkImage(imageUrl),
+                                  fit: BoxFit.cover,
+                                )
+                              : null,
+                          shape: BoxShape.circle,
                         ),
-                        fit: BoxFit.cover,
-                      ),
-                      shape: BoxShape.circle,
-                    ),
+                        child: hasImage
+                            ? null
+                            : const Icon(Icons.person, color: Colors.grey),
+                      );
+                    },
                   ),
                   const SizedBox(width: 16),
                   Text(

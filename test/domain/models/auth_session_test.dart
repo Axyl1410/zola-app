@@ -75,5 +75,35 @@ void main() {
 
       expect(session.isExpired, isTrue);
     });
+
+    test('isExpired returns true at boundary when expiresAt is now', () async {
+      final now = DateTime.now();
+      final session = AuthSession(
+        token: 'boundary-token',
+        receivedAt: now.subtract(const Duration(minutes: 1)),
+        expiresAt: now,
+      );
+
+      await Future<void>.delayed(const Duration(milliseconds: 1));
+      expect(session.isExpired, isTrue);
+    });
+
+    test('isExpired handles near-boundary values consistently', () async {
+      final baseNow = DateTime.now();
+      final almostExpired = AuthSession(
+        token: 'almost-expired',
+        receivedAt: baseNow.subtract(const Duration(minutes: 1)),
+        expiresAt: baseNow.add(const Duration(milliseconds: 2)),
+      );
+      final justExpired = AuthSession(
+        token: 'just-expired',
+        receivedAt: baseNow.subtract(const Duration(minutes: 1)),
+        expiresAt: baseNow.subtract(const Duration(milliseconds: 2)),
+      );
+
+      expect(justExpired.isExpired, isTrue);
+      await Future<void>.delayed(const Duration(milliseconds: 3));
+      expect(almostExpired.isExpired, isTrue);
+    });
   });
 }

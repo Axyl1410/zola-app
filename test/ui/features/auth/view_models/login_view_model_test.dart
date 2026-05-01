@@ -15,10 +15,29 @@ import 'package:zola/domain/models/google_auth_result.dart';
 import 'package:zola/domain/models/auth_user.dart';
 import 'package:zola/ui/features/auth/view_models/auth_status_providers.dart';
 import 'package:zola/ui/features/auth/view_models/auth_status_view_model.dart';
+import 'package:zola/ui/features/auth/view_models/login_view_model.dart';
 import 'package:zola/ui/features/auth/view_models/login_providers.dart';
 
 void main() {
   group('LoginNotifier', () {
+    test('formatTokenForLog masks token by default', () {
+      expect(
+        LoginNotifier.formatTokenForLog('backend-jwt'),
+        'backen***-jwt',
+      );
+      expect(LoginNotifier.formatTokenForLog('1234567890'), '12***');
+    });
+
+    test('formatTokenForLog returns full token when enabled', () {
+      expect(
+        LoginNotifier.formatTokenForLog(
+          'backend-jwt',
+          logFullToken: true,
+        ),
+        'backend-jwt',
+      );
+    });
+
     test('signInWithGoogle saves backend token and succeeds', () async {
       final fakeGoogleRepo = _FakeGoogleAuthRepository();
       final fakeBackendRepo = _FakeAuthBackendRepository(
@@ -114,7 +133,7 @@ class _NoopAuthRemoteService extends AuthRemoteService {
   _NoopAuthRemoteService()
     : super(
         apiClient: ApiClient(
-          authSessionRepository: _FakeAuthSessionRepository(),
+          authTokenProvider: _FakeAuthSessionRepository(),
         ),
       );
 

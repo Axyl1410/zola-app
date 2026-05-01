@@ -10,7 +10,7 @@ void main() {
     test('throws when backend base url is missing', () async {
       final service = AuthRemoteService(
         apiClient: ApiClient(
-          authSessionRepository: _FakeAuthSessionRepository(),
+          authTokenProvider: _FakeAuthSessionRepository(),
         ),
       );
 

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zola/ui/features/auth/view_models/auth_status_providers.dart';
 import 'package:zola/ui/features/auth/view_models/auth_status_view_model.dart';
+import 'package:zola/ui/features/auth/views/auth_required_view.dart';
 import 'package:zola/ui/features/auth/views/banned_view.dart';
 import 'package:zola/ui/features/auth/views/login_view.dart';
 import 'package:zola/ui/features/home/views/home_view.dart';
@@ -60,6 +61,7 @@ class _AppState extends ConsumerState<App> with WidgetsBindingObserver {
       theme: _buildLightTheme(),
       home: switch (authStatus) {
         AuthStatus.checking => const _AuthLoadingView(),
+        AuthStatus.sessionRecoveryRequired => const AuthRequiredView(),
         AuthStatus.authenticated => const HomeView(),
         AuthStatus.banned => const BannedView(),
         AuthStatus.unauthenticated => const LoginView(),

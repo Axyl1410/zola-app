@@ -52,7 +52,7 @@ class _FakeTodoRepository extends TodoRepository {
     : super(
         todoRemoteService: TodoRemoteService(
           apiClient: ApiClient(
-            authSessionRepository: _FakeAuthSessionRepository(),
+          authTokenProvider: _FakeAuthSessionRepository(),
           ),
         ),
       );

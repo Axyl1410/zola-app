@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:zola/di/providers/repositories_providers.dart';
 import 'package:zola/ui/features/auth/view_models/auth_status_providers.dart';
 
 const _unsetMessagesField = Object();
@@ -30,18 +29,6 @@ class MessagesNotifier extends Notifier<MessagesState> {
   Future<void> logout() async {
     state = state.copyWith(isLoading: true, errorMessage: null);
     try {
-      final token = await ref
-          .read(authSessionRepositoryProvider)
-          .getValidToken();
-      if (token != null && token.isNotEmpty) {
-        try {
-          await ref
-              .read(authBackendRepositoryProvider)
-              .signOut(bearerToken: token);
-        } catch (_) {
-          // Ignore sign-out API failure per requirement.
-        }
-      }
       await ref.read(authStatusNotifierProvider.notifier).logout();
       state = state.copyWith(isLoading: false);
     } catch (error) {

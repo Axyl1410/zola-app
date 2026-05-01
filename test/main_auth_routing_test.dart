@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:zola/ui/features/auth/view_models/auth_status_providers.dart';
 import 'package:zola/ui/features/auth/view_models/auth_status_view_model.dart';
+import 'package:zola/ui/features/auth/views/auth_required_view.dart';
 import 'package:zola/ui/features/auth/views/banned_view.dart';
 import 'package:zola/ui/features/auth/views/login_view.dart';
 import 'package:zola/ui/features/home/views/home_view.dart';
@@ -75,6 +76,53 @@ void main() {
 
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
   });
+
+  testWidgets('App routes to AuthRequiredView when recovery is required', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          authStatusNotifierProvider.overrideWith(
+            () => _FakeAuthStatusNotifier(AuthStatus.sessionRecoveryRequired),
+          ),
+        ],
+        child: const _AuthRouteHost(),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.byType(AuthRequiredView), findsOneWidget);
+  });
+
+  testWidgets('App route transitions from recovery to authenticated', (
+    WidgetTester tester,
+  ) async {
+    final container = ProviderContainer(
+      overrides: [
+        authStatusNotifierProvider.overrideWith(
+          () => _FakeAuthStatusNotifier(AuthStatus.sessionRecoveryRequired),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const _AuthRouteHost(),
+      ),
+    );
+    await tester.pump();
+    expect(find.byType(AuthRequiredView), findsOneWidget);
+
+    final notifier = container.read(authStatusNotifierProvider.notifier)
+        as _FakeAuthStatusNotifier;
+    notifier.setStatus(AuthStatus.authenticated);
+    await tester.pump();
+
+    expect(find.byType(HomeView), findsOneWidget);
+  });
 }
 
 class _AuthRouteHost extends ConsumerWidget {
@@ -88,6 +136,7 @@ class _AuthRouteHost extends ConsumerWidget {
         AuthStatus.checking => const Scaffold(
           body: Center(child: CircularProgressIndicator()),
         ),
+        AuthStatus.sessionRecoveryRequired => const AuthRequiredView(),
         AuthStatus.authenticated => const HomeView(),
         AuthStatus.banned => const BannedView(),
         AuthStatus.unauthenticated => const LoginView(),
@@ -106,4 +155,8 @@ class _FakeAuthStatusNotifier extends AuthStatusNotifier {
 
   @override
   Future<void> enableSessionGuard() async {}
+
+  void setStatus(AuthStatus next) {
+    state = next;
+  }
 }

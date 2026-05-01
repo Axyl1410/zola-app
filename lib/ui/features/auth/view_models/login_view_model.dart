@@ -4,6 +4,10 @@ import 'package:zola/di/providers/repositories_providers.dart';
 import 'package:zola/ui/features/auth/view_models/auth_status_providers.dart';
 
 const _unsetLoginField = Object();
+const _logFullToken = bool.fromEnvironment(
+  'LOG_FULL_TOKEN',
+  defaultValue: false,
+);
 
 class LoginState {
   const LoginState({
@@ -35,6 +39,20 @@ class LoginNotifier extends Notifier<LoginState> {
   @override
   LoginState build() => const LoginState();
 
+  @visibleForTesting
+  static String formatTokenForLog(
+    String token, {
+    bool logFullToken = _logFullToken,
+  }) {
+    if (logFullToken) {
+      return token;
+    }
+    if (token.length <= 10) {
+      return '${token.substring(0, 2)}***';
+    }
+    return '${token.substring(0, 6)}***${token.substring(token.length - 4)}';
+  }
+
   Future<void> signInWithGoogle() async {
     state = state.copyWith(
       isLoading: true,
@@ -49,7 +67,10 @@ class LoginNotifier extends Notifier<LoginState> {
           .read(authBackendRepositoryProvider)
           .signInWithGoogle(authResult);
       final token = backendResult.token;
-      debugPrint('Login success token: $token');
+      if (kDebugMode) {
+        final displayToken = formatTokenForLog(token);
+        debugPrint('Login success token: $displayToken');
+      }
       await ref
           .read(authStatusNotifierProvider.notifier)
           .markAuthenticated(token, user: backendResult.user);

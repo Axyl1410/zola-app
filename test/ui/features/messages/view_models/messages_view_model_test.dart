@@ -90,7 +90,7 @@ class _NoopAuthRemoteService extends AuthRemoteService {
   _NoopAuthRemoteService()
     : super(
         apiClient: ApiClient(
-          authSessionRepository: _FakeAuthSessionRepository(),
+          authTokenProvider: _FakeAuthSessionRepository(),
         ),
       );
 

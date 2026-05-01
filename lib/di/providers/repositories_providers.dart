@@ -26,7 +26,7 @@ final authSessionRepositoryProvider = Provider<AuthSessionRepository>((ref) {
 
 final apiClientProvider = Provider<ApiClient>((ref) {
   return ApiClient(
-    authSessionRepository: ref.watch(authSessionRepositoryProvider),
+    authTokenProvider: ref.watch(authSessionRepositoryProvider),
   );
 });
 

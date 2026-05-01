@@ -40,7 +40,7 @@ void main() {
 
 class _FakeApiClient extends ApiClient {
   _FakeApiClient({required this.response})
-    : super(authSessionRepository: _FakeAuthSessionRepository());
+    : super(authTokenProvider: _FakeAuthSessionRepository());
 
   final http.Response response;
   Uri? lastUri;
