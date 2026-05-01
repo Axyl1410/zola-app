@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zola/di/providers/repositories_providers.dart';
+import 'package:zola/domain/models/auth_user.dart';
 
 enum AuthStatus { checking, authenticated, unauthenticated }
 
@@ -31,17 +32,26 @@ class AuthStatusNotifier extends Notifier<AuthStatus> {
   }
 
   Future<void> refreshAuthStatus() async {
-    final token = await ref.read(authSessionRepositoryProvider).getValidToken();
+    final repository = ref.read(authSessionRepositoryProvider);
+    final token = await repository.getValidToken();
     state = (token != null && token.isNotEmpty)
         ? AuthStatus.authenticated
         : AuthStatus.unauthenticated;
     if (state == AuthStatus.unauthenticated) {
       _tokenExpiryTimer?.cancel();
+      // Ensure profile cache is always cleared when session is invalid.
+      await repository.clearSession();
     }
   }
 
-  Future<void> markAuthenticated(String token) async {
-    await ref.read(authSessionRepositoryProvider).saveToken(token);
+  Future<void> markAuthenticated(String token, {AuthUser? user}) async {
+    final repository = ref.read(authSessionRepositoryProvider);
+    await repository.saveToken(token);
+    if (user != null) {
+      await repository.saveUser(user);
+    } else {
+      await repository.clearUser();
+    }
     state = AuthStatus.authenticated;
     await _scheduleExpiryCheckFromSession();
   }

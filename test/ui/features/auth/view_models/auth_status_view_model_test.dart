@@ -48,6 +48,7 @@ void main() {
         container.read(authStatusNotifierProvider),
         AuthStatus.unauthenticated,
       );
+      expect(fakeRepository.clearCalled, isTrue);
     });
 
     test('markAuthenticated saves token and sets authenticated', () async {
@@ -68,6 +69,22 @@ void main() {
         container.read(authStatusNotifierProvider),
         AuthStatus.authenticated,
       );
+    });
+
+    test('markAuthenticated clears cached user when user is null', () async {
+      final fakeRepository = _FakeAuthSessionRepository(validToken: null);
+      final container = ProviderContainer(
+        overrides: [
+          authSessionRepositoryProvider.overrideWithValue(fakeRepository),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await container
+          .read(authStatusNotifierProvider.notifier)
+          .markAuthenticated('new-token');
+
+      expect(fakeRepository.clearUserCalled, isTrue);
     });
 
     test('logout clears session and sets unauthenticated', () async {
@@ -100,6 +117,7 @@ class _FakeAuthSessionRepository extends AuthSessionRepository {
   DateTime? expiresAt;
   String? savedToken;
   bool clearCalled = false;
+  bool clearUserCalled = false;
 
   @override
   Future<String?> getValidToken() async {
@@ -111,6 +129,11 @@ class _FakeAuthSessionRepository extends AuthSessionRepository {
     clearCalled = true;
     validToken = null;
     expiresAt = null;
+  }
+
+  @override
+  Future<void> clearUser() async {
+    clearUserCalled = true;
   }
 
   @override

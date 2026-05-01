@@ -8,6 +8,7 @@ import 'package:zola/data/services/api_client.dart';
 import 'package:zola/data/services/auth_remote_service.dart';
 import 'package:zola/data/services/secure_storage_service.dart';
 import 'package:zola/di/providers.dart';
+import 'package:zola/domain/models/auth_user.dart';
 import 'package:zola/ui/features/auth/view_models/auth_status_view_model.dart';
 
 void main() {
@@ -130,7 +131,7 @@ class _FakeAuthStatusNotifier extends AuthStatusNotifier {
   AuthStatus build() => AuthStatus.unauthenticated;
 
   @override
-  Future<void> markAuthenticated(String token) async {
+  Future<void> markAuthenticated(String token, {AuthUser? user}) async {
     state = AuthStatus.authenticated;
   }
 }

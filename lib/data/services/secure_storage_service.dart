@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:zola/domain/models/auth_session.dart';
+import 'package:zola/domain/models/auth_user.dart';
 
 class SecureStorageService {
   SecureStorageService({FlutterSecureStorage? storage})
@@ -10,6 +13,7 @@ class SecureStorageService {
   static const _tokenKey = 'auth.token';
   static const _receivedAtKey = 'auth.receivedAt';
   static const _expiresAtKey = 'auth.expiresAt';
+  static const _userKey = 'auth.user';
 
   static const FlutterSecureStorage _defaultStorage = FlutterSecureStorage(
     aOptions: AndroidOptions(),
@@ -89,5 +93,31 @@ class SecureStorageService {
     await _storage.delete(key: _tokenKey);
     await _storage.delete(key: _receivedAtKey);
     await _storage.delete(key: _expiresAtKey);
+    await _storage.delete(key: _userKey);
+  }
+
+  Future<void> saveUser(AuthUser user) async {
+    await _storage.write(key: _userKey, value: jsonEncode(user.toJson()));
+  }
+
+  Future<AuthUser?> getUser() async {
+    final raw = await _storage.read(key: _userKey);
+    if (raw == null || raw.isEmpty) {
+      return null;
+    }
+
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is! Map<String, dynamic>) {
+        return null;
+      }
+      return AuthUser.fromJson(decoded);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> clearUser() async {
+    await _storage.delete(key: _userKey);
   }
 }
