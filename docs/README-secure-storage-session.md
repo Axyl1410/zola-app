@@ -1,44 +1,51 @@
-# Secure Storage Session Utils
+# Secure Storage + Session (Current Design)
 
-Utility added for managing auth token/session in a scalable structure:
+Tài liệu này cập nhật theo design hiện tại sau refactor auth.
+
+## Hiện trạng phân tách trách nhiệm
 
 - `lib/data/services/secure_storage_service.dart`
+  - chỉ là wrapper key-value quanh `flutter_secure_storage`
+  - không chứa business logic session/user nữa
+- `lib/data/repositories/auth_session_repository.dart`
+  - chứa logic session auth:
+    - save token/session
+    - validate token còn hạn (`getValidToken`)
+    - save/get/clear user cache
+    - clear fail-safe khi session corrupt/expired
 - `lib/domain/models/auth_session.dart`
-
-## Why this structure
-
-Following layered architecture:
-
-- Data layer service wraps platform plugin (`flutter_secure_storage`).
-- Domain model (`AuthSession`) gives typed session object for app logic.
+  - model session có typed fields `token/receivedAt/expiresAt`
 
 ## Default behavior
 
-- Uses secure storage defaults on Android (latest plugin cipher backend).
-- Uses Keychain accessibility on iOS/macOS (`first_unlock`).
-- Session TTL defaults to 7 days (`Duration(days: 7)`).
+- Secure storage defaults trên Android
+- Keychain accessibility `first_unlock` trên iOS/macOS
+- Session TTL mặc định ở repository: `Duration(days: 7)`
 
-## Basic usage
+## Các key đang dùng
+
+- `auth.token`
+- `auth.receivedAt`
+- `auth.expiresAt`
+- `auth.user`
+
+## Cách dùng (recommended)
+
+Không gọi thẳng service cho auth flow. Sử dụng repository:
+
+```dart
+final repo = ref.read(authSessionRepositoryProvider);
+
+await repo.saveToken(token);
+final token = await repo.getValidToken();
+final session = await repo.getSession();
+await repo.clearSession();
+```
+
+Service key-value vẫn có thể dùng cho nhu cầu generic:
 
 ```dart
 final storage = SecureStorageService();
-
-// Save token with default 7 days TTL
-await storage.saveSessionToken(tokenFromBackend);
-
-// Read valid token (returns null if expired/missing)
-final token = await storage.getValidToken();
-
-// Read full session metadata
-final session = await storage.getSession();
-
-// Clear only auth session keys
-await storage.clearSession();
-```
-
-## Generic key-value helpers
-
-```dart
 await storage.writeValue(key: 'foo', value: 'bar');
 final value = await storage.readValue('foo');
 await storage.deleteValue('foo');
@@ -47,8 +54,8 @@ await storage.clearAll();
 
 ## Android note
 
-Manifest configured with:
+Manifest đã cấu hình:
 
 - `android:allowBackup="false"`
 
-This avoids backup/restore key mismatch issues that can break encrypted storage.
+Mục tiêu: tránh backup/restore mismatch key gây lỗi encrypted storage.
