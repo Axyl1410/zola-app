@@ -234,6 +234,43 @@ void main() {
       expect(isActive, isFalse);
       expect(container.read(authStatusNotifierProvider), AuthStatus.banned);
     });
+
+    test('ensureSessionActiveForLifecycle keeps banned state on non-401 error', () async {
+      final fakeRepository = _FakeAuthSessionRepository(validToken: null);
+      final fakeBackendRepository = _FakeAuthBackendRepository(
+        sessionError: const AuthBackendHttpException(
+          statusCode: 500,
+          message: 'Internal server error',
+        ),
+      );
+      final container = ProviderContainer(
+        overrides: [
+          authSessionRepositoryProvider.overrideWithValue(fakeRepository),
+          authBackendRepositoryProvider.overrideWithValue(fakeBackendRepository),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      await container
+          .read(authStatusNotifierProvider.notifier)
+          .markAuthenticated(
+            'new-token',
+            user: const AuthUser(
+              id: 'u_banned',
+              name: 'Banned User',
+              email: 'banned@zola.app',
+              emailVerified: true,
+              banned: true,
+            ),
+          );
+
+      final isActive = await container
+          .read(authStatusNotifierProvider.notifier)
+          .ensureSessionActiveForLifecycle();
+
+      expect(isActive, isFalse);
+      expect(container.read(authStatusNotifierProvider), AuthStatus.banned);
+    });
   });
 }
 

@@ -52,11 +52,17 @@ class AuthStatusNotifier extends Notifier<AuthStatus> {
   }
 
   // Backward-compatible alias for existing call sites.
-  Future<bool> ensureSessionActive({bool requireOnlineValidation = true}) async {
-    return _ensureSessionActive(requireOnlineValidation: requireOnlineValidation);
+  Future<bool> ensureSessionActive({
+    bool requireOnlineValidation = true,
+  }) async {
+    return _ensureSessionActive(
+      requireOnlineValidation: requireOnlineValidation,
+    );
   }
 
-  Future<bool> _ensureSessionActive({required bool requireOnlineValidation}) async {
+  Future<bool> _ensureSessionActive({
+    required bool requireOnlineValidation,
+  }) async {
     final sessionRepository = ref.read(authSessionRepositoryProvider);
     final token = await sessionRepository.getValidToken();
     if (!ref.mounted) {
@@ -102,8 +108,8 @@ class AuthStatusNotifier extends Notifier<AuthStatus> {
         debugPrint(
           'Session check skipped due to non-401 error: ${error.message}',
         );
-        state = AuthStatus.authenticated;
-        return true;
+        // Keep current auth state on lifecycle lenient checks.
+        return state == AuthStatus.authenticated;
       }
       return false;
     } catch (error) {
@@ -112,8 +118,8 @@ class AuthStatusNotifier extends Notifier<AuthStatus> {
       }
       if (!requireOnlineValidation) {
         debugPrint('Session check skipped due to error: $error');
-        state = AuthStatus.authenticated;
-        return true;
+        // Keep current auth state on lifecycle lenient checks.
+        return state == AuthStatus.authenticated;
       }
       return false;
     }
