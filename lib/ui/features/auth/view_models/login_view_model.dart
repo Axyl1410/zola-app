@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zola/di/providers/repositories_providers.dart';
 import 'package:zola/ui/features/auth/view_models/auth_status_providers.dart';
+import 'package:zola/ui/features/auth/view_models/login_providers.dart';
 
 const _unsetLoginField = Object();
 const _logFullToken = bool.fromEnvironment(
@@ -74,6 +75,13 @@ class LoginNotifier extends Notifier<LoginState> {
       await ref
           .read(authStatusNotifierProvider.notifier)
           .markAuthenticated(token, user: backendResult.user);
+      final lastLoginMethod = backendResult.user?.lastLoginMethod;
+      if (lastLoginMethod != null && lastLoginMethod.isNotEmpty) {
+        await ref
+            .read(authSessionRepositoryProvider)
+            .saveLastLoginMethod(lastLoginMethod);
+        ref.invalidate(lastLoginMethodProvider);
+      }
       state = state.copyWith(
         isLoading: false,
         errorMessage: null,

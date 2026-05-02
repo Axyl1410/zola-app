@@ -37,7 +37,12 @@ class PersonalScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 12),
             userState.when(
-              loading: () => const CircularProgressIndicator(),
+              loading: () => const Center(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 24),
+                  child: CircularProgressIndicator(),
+                ),
+              ),
               error: (error, stackTrace) => Text(
                 'Không tải được thông tin người dùng: $error',
                 style: const TextStyle(color: Colors.black54),

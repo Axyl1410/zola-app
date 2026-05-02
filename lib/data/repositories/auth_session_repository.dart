@@ -14,6 +14,7 @@ class AuthSessionRepository implements AuthTokenProvider {
   static const String _receivedAtKey = 'auth.receivedAt';
   static const String _expiresAtKey = 'auth.expiresAt';
   static const String _userKey = 'auth.user';
+  static const String _lastLoginMethodKey = 'auth.lastLoginMethod';
 
   final SecureStorageService _secureStorageService;
 
@@ -118,6 +119,24 @@ class AuthSessionRepository implements AuthTokenProvider {
 
   Future<void> clearUser() async {
     await _secureStorageService.deleteValue(_userKey);
+  }
+
+  Future<void> saveLastLoginMethod(String method) async {
+    if (method.isEmpty) {
+      return;
+    }
+    await _secureStorageService.writeValue(
+      key: _lastLoginMethodKey,
+      value: method,
+    );
+  }
+
+  Future<String?> getLastLoginMethod() {
+    return _secureStorageService.readValue(_lastLoginMethodKey);
+  }
+
+  Future<void> clearLastLoginMethod() {
+    return _secureStorageService.deleteValue(_lastLoginMethodKey);
   }
 
   Future<void> clearSession() async {

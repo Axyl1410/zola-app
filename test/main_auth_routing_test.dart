@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:zola/ui/core/widgets/linear_loading_placeholder.dart';
 import 'package:zola/ui/features/auth/view_models/auth_status_providers.dart';
 import 'package:zola/ui/features/auth/view_models/auth_status_view_model.dart';
 import 'package:zola/ui/features/auth/views/auth_required_view.dart';
@@ -45,7 +46,9 @@ void main() {
     expect(find.byType(HomeView), findsOneWidget);
   });
 
-  testWidgets('App routes to BannedView when banned', (WidgetTester tester) async {
+  testWidgets('App routes to BannedView when banned', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
@@ -61,7 +64,9 @@ void main() {
     expect(find.byType(BannedView), findsOneWidget);
   });
 
-  testWidgets('App shows loading view while checking', (WidgetTester tester) async {
+  testWidgets('App shows loading view while checking', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
@@ -74,7 +79,7 @@ void main() {
     );
     await tester.pump();
 
-    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    expect(find.byType(LinearProgressIndicator), findsOneWidget);
   });
 
   testWidgets('App routes to AuthRequiredView when recovery is required', (
@@ -116,8 +121,9 @@ void main() {
     await tester.pump();
     expect(find.byType(AuthRequiredView), findsOneWidget);
 
-    final notifier = container.read(authStatusNotifierProvider.notifier)
-        as _FakeAuthStatusNotifier;
+    final notifier =
+        container.read(authStatusNotifierProvider.notifier)
+            as _FakeAuthStatusNotifier;
     notifier.setStatus(AuthStatus.authenticated);
     await tester.pump();
 
@@ -134,7 +140,7 @@ class _AuthRouteHost extends ConsumerWidget {
     return MaterialApp(
       home: switch (authStatus) {
         AuthStatus.checking => const Scaffold(
-          body: Center(child: CircularProgressIndicator()),
+          body: LinearLoadingScaffoldBody(),
         ),
         AuthStatus.sessionRecoveryRequired => const AuthRequiredView(),
         AuthStatus.authenticated => const HomeView(),

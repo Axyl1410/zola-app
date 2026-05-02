@@ -29,9 +29,6 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
         );
       }
     });
-    final state = ref.watch(messagesNotifierProvider);
-    final notifier = ref.read(messagesNotifierProvider.notifier);
-
     return Scaffold(
       appBar: buildDefaultHomeAppBar(),
       body: Center(
@@ -48,11 +45,6 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
               ),
               onPressed: () => setState(() => _counter++),
               child: const Text('Bấm thử'),
-            ),
-            const SizedBox(height: 12),
-            ElevatedButton(
-              onPressed: state.isLoading ? null : notifier.logout,
-              child: const Text('Đăng xuất'),
             ),
           ],
         ),

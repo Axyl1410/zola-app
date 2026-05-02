@@ -12,6 +12,7 @@ void main() {
         'image': 'https://example.com/avatar.png',
         'createdAt': '2026-05-01T10:00:00.000Z',
         'updatedAt': '2026-05-01T10:30:00.000Z',
+        'lastLoginMethod': 'google',
         'role': 'admin',
         'banned': false,
         'banReason': 'none',
@@ -26,6 +27,7 @@ void main() {
       expect(result.image, 'https://example.com/avatar.png');
       expect(result.createdAt, '2026-05-01T10:00:00.000Z');
       expect(result.updatedAt, '2026-05-01T10:30:00.000Z');
+      expect(result.lastLoginMethod, 'google');
       expect(result.role, 'admin');
       expect(result.banned, isFalse);
       expect(result.banReason, 'none');
@@ -42,6 +44,7 @@ void main() {
 
       expect(result, isNotNull);
       expect(result!.role, isNull);
+      expect(result.lastLoginMethod, isNull);
       expect(result.banned, isFalse);
       expect(result.banReason, isNull);
       expect(result.banExpires, isNull);
@@ -57,14 +60,29 @@ void main() {
         banned: true,
         banReason: 'policy violation',
         banExpires: '2026-06-01T00:00:00.000Z',
+        lastLoginMethod: 'oauth',
       );
 
       final json = user.toJson();
 
+      expect(json['lastLoginMethod'], 'oauth');
       expect(json['role'], 'user');
       expect(json['banned'], isTrue);
       expect(json['banReason'], 'policy violation');
       expect(json['banExpires'], '2026-06-01T00:00:00.000Z');
+    });
+
+    test('fromJson maps last_login_method when lastLoginMethod absent', () {
+      final result = AuthUser.fromJson({
+        'id': 'u_snake',
+        'name': 'Snake',
+        'email': 'snake@example.com',
+        'emailVerified': false,
+        'last_login_method': 'email',
+      });
+
+      expect(result, isNotNull);
+      expect(result!.lastLoginMethod, 'email');
     });
 
     test('fromJson returns null for missing required fields', () {

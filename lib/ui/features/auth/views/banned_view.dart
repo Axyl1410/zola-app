@@ -8,10 +8,7 @@ import 'package:zola/ui/features/auth/view_models/current_user_provider.dart';
 class BannedView extends ConsumerWidget {
   const BannedView({super.key});
 
-  Future<void> _contactSupport(
-    BuildContext context,
-    AuthUser? user,
-  ) async {
+  Future<void> _contactSupport(BuildContext context, AuthUser? user) async {
     final uri = Uri(
       scheme: 'mailto',
       path: 'support@zola.app',
@@ -93,10 +90,7 @@ class _BannedContent extends StatelessWidget {
         const SizedBox(height: 24),
         _InfoTile(label: 'Lý do', value: reason),
         const SizedBox(height: 12),
-        _InfoTile(
-          label: 'Thời hạn',
-          value: _formatBanExpiry(user?.banExpires),
-        ),
+        _InfoTile(label: 'Thời hạn', value: _formatBanExpiry(user?.banExpires)),
         const Spacer(),
         SizedBox(
           width: double.infinity,

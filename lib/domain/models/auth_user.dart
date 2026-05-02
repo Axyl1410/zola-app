@@ -7,6 +7,7 @@ class AuthUser {
     this.image,
     this.createdAt,
     this.updatedAt,
+    this.lastLoginMethod,
     this.role,
     this.banned = false,
     this.banReason,
@@ -20,6 +21,7 @@ class AuthUser {
   final String? image;
   final String? createdAt;
   final String? updatedAt;
+  final String? lastLoginMethod;
   final String? role;
   final bool banned;
   final String? banReason;
@@ -34,6 +36,7 @@ class AuthUser {
       'image': image,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
+      'lastLoginMethod': lastLoginMethod,
       'role': role,
       'banned': banned,
       'banReason': banReason,
@@ -56,6 +59,8 @@ class AuthUser {
     final image = json['image'];
     final createdAt = json['createdAt'];
     final updatedAt = json['updatedAt'];
+    final lastLoginMethodRaw =
+        json['lastLoginMethod'] ?? json['last_login_method'];
     final role = json['role'];
     final banned = json['banned'];
     final banReason = json['banReason'];
@@ -69,6 +74,7 @@ class AuthUser {
       image: image is String ? image : null,
       createdAt: createdAt is String ? createdAt : null,
       updatedAt: updatedAt is String ? updatedAt : null,
+      lastLoginMethod: lastLoginMethodRaw is String ? lastLoginMethodRaw : null,
       role: role is String ? role : null,
       banned: banned is bool ? banned : false,
       banReason: banReason is String ? banReason : null,

@@ -84,6 +84,75 @@ void main() {
       expect(state.isSuccess, isFalse);
       expect(state.errorMessage, contains('missing token'));
     });
+
+    test(
+      'persists lastLoginMethod when backend user has non-empty value',
+      () async {
+        final recordingRepo = _RecordingAuthSessionRepository();
+        final container = ProviderContainer(
+          overrides: [
+            googleAuthRepositoryProvider.overrideWithValue(
+              _FakeGoogleAuthRepository(),
+            ),
+            authBackendRepositoryProvider.overrideWithValue(
+              _FakeAuthBackendRepository(
+                shouldThrowMissingToken: false,
+                user: const AuthUser(
+                  id: 'u_1',
+                  name: 'Dev',
+                  email: 'dev@zola.app',
+                  emailVerified: true,
+                  lastLoginMethod: 'google',
+                ),
+              ),
+            ),
+            authSessionRepositoryProvider.overrideWithValue(recordingRepo),
+            authStatusNotifierProvider.overrideWith(_FakeAuthStatusNotifier.new),
+          ],
+        );
+        addTearDown(container.dispose);
+
+        await container.read(loginNotifierProvider.notifier).signInWithGoogle();
+
+        expect(recordingRepo.savedLastLoginMethods, ['google']);
+      },
+    );
+
+    test(
+      'does NOT persist lastLoginMethod when backend user value is null',
+      () async {
+        final recordingRepo = _RecordingAuthSessionRepository();
+        await recordingRepo.saveLastLoginMethod('google');
+        recordingRepo.savedLastLoginMethods.clear();
+
+        final container = ProviderContainer(
+          overrides: [
+            googleAuthRepositoryProvider.overrideWithValue(
+              _FakeGoogleAuthRepository(),
+            ),
+            authBackendRepositoryProvider.overrideWithValue(
+              _FakeAuthBackendRepository(
+                shouldThrowMissingToken: false,
+                user: const AuthUser(
+                  id: 'u_1',
+                  name: 'Dev',
+                  email: 'dev@zola.app',
+                  emailVerified: true,
+                ),
+              ),
+            ),
+            authSessionRepositoryProvider.overrideWithValue(recordingRepo),
+            authStatusNotifierProvider.overrideWith(_FakeAuthStatusNotifier.new),
+          ],
+        );
+        addTearDown(container.dispose);
+
+        await container.read(loginNotifierProvider.notifier).signInWithGoogle();
+
+        expect(recordingRepo.savedLastLoginMethods, isEmpty);
+        expect(await recordingRepo.getLastLoginMethod(), 'google');
+      },
+    );
   });
 }
 
@@ -111,10 +180,11 @@ class _NoopGoogleSignInService extends GoogleSignInService {
 }
 
 class _FakeAuthBackendRepository extends AuthBackendRepository {
-  _FakeAuthBackendRepository({required this.shouldThrowMissingToken})
+  _FakeAuthBackendRepository({required this.shouldThrowMissingToken, this.user})
     : super(authRemoteService: _NoopAuthRemoteService());
 
   final bool shouldThrowMissingToken;
+  final AuthUser? user;
   bool called = false;
 
   @override
@@ -125,7 +195,11 @@ class _FakeAuthBackendRepository extends AuthBackendRepository {
     if (shouldThrowMissingToken) {
       throw Exception('Backend response missing token');
     }
-    return const AuthBackendSignInResult(statusCode: 200, token: 'backend-jwt');
+    return AuthBackendSignInResult(
+      statusCode: 200,
+      token: 'backend-jwt',
+      user: user,
+    );
   }
 }
 
@@ -153,6 +227,48 @@ class _FakeAuthSessionRepository extends AuthSessionRepository {
 
 class _FakeSecureStorageService extends SecureStorageService {
   _FakeSecureStorageService() : super(storage: const FlutterSecureStorage());
+}
+
+class _RecordingAuthSessionRepository extends AuthSessionRepository {
+  _RecordingAuthSessionRepository()
+    : super(secureStorageService: _InMemorySecureStorageService());
+
+  final List<String> savedLastLoginMethods = <String>[];
+
+  @override
+  Future<void> saveLastLoginMethod(String method) async {
+    if (method.isEmpty) {
+      return;
+    }
+    savedLastLoginMethods.add(method);
+    await super.saveLastLoginMethod(method);
+  }
+}
+
+class _InMemorySecureStorageService extends SecureStorageService {
+  _InMemorySecureStorageService() : super(storage: const FlutterSecureStorage());
+
+  final Map<String, String> _store = <String, String>{};
+
+  @override
+  Future<void> writeValue({required String key, required String value}) async {
+    _store[key] = value;
+  }
+
+  @override
+  Future<String?> readValue(String key) async {
+    return _store[key];
+  }
+
+  @override
+  Future<void> deleteValue(String key) async {
+    _store.remove(key);
+  }
+
+  @override
+  Future<Map<String, String>> readAll() async {
+    return Map<String, String>.from(_store);
+  }
 }
 
 class _FakeAuthStatusNotifier extends AuthStatusNotifier {

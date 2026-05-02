@@ -7,6 +7,7 @@ import 'package:zola/ui/features/auth/view_models/auth_status_view_model.dart';
 import 'package:zola/ui/features/auth/views/auth_required_view.dart';
 import 'package:zola/ui/features/auth/views/banned_view.dart';
 import 'package:zola/ui/features/auth/views/login_view.dart';
+import 'package:zola/ui/core/widgets/linear_loading_placeholder.dart';
 import 'package:zola/ui/features/home/views/home_view.dart';
 
 void main() {
@@ -53,19 +54,41 @@ class _AppState extends ConsumerState<App> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     final authStatus = ref.watch(authStatusNotifierProvider);
+    final Widget homeChild = switch (authStatus) {
+      AuthStatus.checking => const _AuthLoadingView(),
+      AuthStatus.sessionRecoveryRequired => const AuthRequiredView(),
+      AuthStatus.authenticated => const HomeView(),
+      AuthStatus.banned => const BannedView(),
+      AuthStatus.unauthenticated => const LoginView(),
+    };
     return MaterialApp(
       key: ValueKey<AuthStatus>(authStatus),
       debugShowCheckedModeBanner: false,
       title: 'Zola',
       themeMode: _themeMode,
       theme: _buildLightTheme(),
-      home: switch (authStatus) {
-        AuthStatus.checking => const _AuthLoadingView(),
-        AuthStatus.sessionRecoveryRequired => const AuthRequiredView(),
-        AuthStatus.authenticated => const HomeView(),
-        AuthStatus.banned => const BannedView(),
-        AuthStatus.unauthenticated => const LoginView(),
+      builder: (context, child) {
+        final logoutOverlay = ref.watch(logoutInProgressProvider);
+        final belowAppBarTop =
+            MediaQuery.paddingOf(context).top + kToolbarHeight;
+        return Stack(
+          fit: StackFit.expand,
+          children: [
+            child ?? const SizedBox.shrink(),
+            if (logoutOverlay)
+              Positioned(
+                left: 0,
+                right: 0,
+                top: belowAppBarTop,
+                child: SizedBox(
+                  height: 3,
+                  child: LinearProgressIndicator(minHeight: 3),
+                ),
+              ),
+          ],
+        );
       },
+      home: homeChild,
     );
   }
 
@@ -90,6 +113,6 @@ class _AuthLoadingView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    return const Scaffold(body: LinearLoadingScaffoldBody());
   }
 }

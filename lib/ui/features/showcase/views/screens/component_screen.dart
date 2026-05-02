@@ -1018,7 +1018,7 @@ class _ProgressIndicatorsState extends State<ProgressIndicators> {
     return ComponentDecoration(
       label: 'Progress indicators',
       tooltipMessage:
-          'Use CircularProgressIndicator or LinearProgressIndicator',
+          'Prefer LinearProgressIndicator on screens; circular shown for comparison',
       child: Column(
         children: <Widget>[
           Row(

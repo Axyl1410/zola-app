@@ -57,6 +57,7 @@ void main() {
       expect(result.token, 'backend-jwt');
       expect(result.user, isNotNull);
       expect(result.user!.email, 'dev@zola.app');
+      expect(result.user!.lastLoginMethod, 'google');
     });
 
     test('delegates signOut token to remote service', () async {
@@ -137,7 +138,7 @@ class _FakeAuthRemoteService extends AuthRemoteService {
     lastAccessToken = accessToken;
     return signInResponse ??
         http.Response(
-          '{"token":"backend-jwt","user":{"id":"u_1","name":"Dev","email":"dev@zola.app","emailVerified":true}}',
+          '{"token":"backend-jwt","user":{"id":"u_1","name":"Dev","email":"dev@zola.app","emailVerified":true,"lastLoginMethod":"google"}}',
           201,
         );
   }

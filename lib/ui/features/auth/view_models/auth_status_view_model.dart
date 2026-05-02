@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zola/data/repositories/auth_backend_repository.dart';
 import 'package:zola/di/providers/repositories_providers.dart';
 import 'package:zola/domain/models/auth_user.dart';
+import 'package:zola/ui/features/auth/view_models/auth_logout_busy_provider.dart';
 import 'package:zola/ui/features/auth/view_models/current_user_provider.dart';
 
 enum AuthStatus {
@@ -240,25 +241,32 @@ class AuthStatusNotifier extends Notifier<AuthStatus> {
   }
 
   Future<void> logout({bool notifyBackend = true}) async {
-    _resetCriticalValidationCache();
-    if (!notifyBackend) {
-      await _clearLocalSessionAndSetUnauthenticated();
-      return;
-    }
+    ref.read(logoutInProgressProvider.notifier).state = true;
+    try {
+      _resetCriticalValidationCache();
+      if (!notifyBackend) {
+        await _clearLocalSessionAndSetUnauthenticated();
+        return;
+      }
 
-    final sessionRepository = ref.read(authSessionRepositoryProvider);
-    final token = await sessionRepository.getValidToken();
-    if (token != null && token.isNotEmpty) {
-      try {
-        await ref
-            .read(authBackendRepositoryProvider)
-            .signOut(bearerToken: token);
-      } catch (error) {
-        // Always clear local session even if backend logout fails.
-        debugPrint('Backend sign-out failed, fallback to local clear: $error');
+      final sessionRepository = ref.read(authSessionRepositoryProvider);
+      final token = await sessionRepository.getValidToken();
+      if (token != null && token.isNotEmpty) {
+        try {
+          await ref
+              .read(authBackendRepositoryProvider)
+              .signOut(bearerToken: token);
+        } catch (error) {
+          // Always clear local session even if backend logout fails.
+          debugPrint('Backend sign-out failed, fallback to local clear: $error');
+        }
+      }
+      await _clearLocalSessionAndSetUnauthenticated();
+    } finally {
+      if (ref.mounted) {
+        ref.read(logoutInProgressProvider.notifier).state = false;
       }
     }
-    await _clearLocalSessionAndSetUnauthenticated();
   }
 
   Future<void> _scheduleExpiryCheckFromSession() async {

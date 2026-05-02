@@ -112,12 +112,14 @@ void main() {
         name: 'Test User',
         email: 'test@zola.app',
         emailVerified: true,
+        lastLoginMethod: 'google',
       );
 
       await repository.saveUser(user);
       final loaded = await repository.getUser();
       expect(loaded?.id, user.id);
       expect(loaded?.email, user.email);
+      expect(loaded?.lastLoginMethod, 'google');
 
       await repository.clearUser();
       expect(await repository.getUser(), isNull);
@@ -166,6 +168,52 @@ void main() {
       await repository.clearSession();
 
       expect(fakeService.storage, isEmpty);
+    });
+
+    group('lastLoginMethod', () {
+      test('saveLastLoginMethod writes value to storage', () async {
+        await repository.saveLastLoginMethod('google');
+        expect(fakeService.storage['auth.lastLoginMethod'], 'google');
+      });
+
+      test('saveLastLoginMethod is a no-op for empty string', () async {
+        await repository.saveLastLoginMethod('');
+        expect(fakeService.storage.containsKey('auth.lastLoginMethod'), isFalse);
+      });
+
+      test('getLastLoginMethod returns saved value or null', () async {
+        expect(await repository.getLastLoginMethod(), isNull);
+
+        await repository.saveLastLoginMethod('google');
+        expect(await repository.getLastLoginMethod(), 'google');
+      });
+
+      test('saveLastLoginMethod overrides previous value', () async {
+        await repository.saveLastLoginMethod('google');
+        await repository.saveLastLoginMethod('email-password');
+
+        expect(await repository.getLastLoginMethod(), 'email-password');
+      });
+
+      test('clearSession does NOT remove lastLoginMethod', () async {
+        await repository.saveLastLoginMethod('google');
+        fakeService.storage['auth.token'] = 'x';
+        fakeService.storage['auth.receivedAt'] = 'y';
+        fakeService.storage['auth.expiresAt'] = 'z';
+        fakeService.storage['auth.user'] = '{}';
+
+        await repository.clearSession();
+
+        expect(fakeService.storage['auth.lastLoginMethod'], 'google');
+      });
+
+      test('clearLastLoginMethod removes the key', () async {
+        await repository.saveLastLoginMethod('google');
+
+        await repository.clearLastLoginMethod();
+
+        expect(fakeService.storage.containsKey('auth.lastLoginMethod'), isFalse);
+      });
     });
   });
 }
