@@ -12,7 +12,8 @@ void main() {
     storage = <String, String>{};
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(channel, (MethodCall methodCall) async {
-          final arguments = (methodCall.arguments as Map?)?.cast<String, dynamic>() ??
+          final arguments =
+              (methodCall.arguments as Map?)?.cast<String, dynamic>() ??
               <String, dynamic>{};
 
           switch (methodCall.method) {
@@ -36,7 +37,8 @@ void main() {
             default:
               throw PlatformException(
                 code: 'unimplemented',
-                message: 'Method ${methodCall.method} is not implemented in test',
+                message:
+                    'Method ${methodCall.method} is not implemented in test',
               );
           }
         });

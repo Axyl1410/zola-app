@@ -86,10 +86,7 @@ void main() {
     });
 
     test('fromJson returns null for missing required fields', () {
-      final result = AuthUser.fromJson({
-        'id': 'u_4',
-        'name': 'No Email',
-      });
+      final result = AuthUser.fromJson({'id': 'u_4', 'name': 'No Email'});
 
       expect(result, isNull);
     });

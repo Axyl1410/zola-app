@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:zola/domain/models/auth_user.dart';
 import 'package:zola/ui/features/admin/views/screens/admin_screen.dart';
 import 'package:zola/ui/features/auth/view_models/auth_status_providers.dart';
@@ -20,21 +21,26 @@ void main() {
     );
     addTearDown(container.dispose);
 
+    final router = _buildTestRouter();
+    addTearDown(router.dispose);
+
     await tester.pumpWidget(
       UncontrolledProviderScope(
         container: container,
-        child: const MaterialApp(home: AdminScreen()),
+        child: MaterialApp.router(routerConfig: router),
       ),
     );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 50));
 
-    final notifier = container.read(authStatusNotifierProvider.notifier)
-        as _FakeAuthStatusNotifier;
+    final notifier =
+        container.read(authStatusNotifierProvider.notifier)
+            as _FakeAuthStatusNotifier;
     expect(notifier.logoutCalled, isFalse);
+    expect(_currentLocation(router), '/admin');
   });
 
-  testWidgets('AdminScreen blocks non-admin user without logout', (
+  testWidgets('AdminScreen redirects non-admin user to personal screen', (
     WidgetTester tester,
   ) async {
     final container = ProviderContainer(
@@ -57,55 +63,84 @@ void main() {
     );
     addTearDown(container.dispose);
 
+    final router = _buildTestRouter();
+    addTearDown(router.dispose);
+
     await tester.pumpWidget(
       UncontrolledProviderScope(
         container: container,
-        child: const MaterialApp(home: AdminScreen()),
+        child: MaterialApp.router(routerConfig: router),
       ),
     );
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 50));
+    await tester.pumpAndSettle();
 
-    final notifier = container.read(authStatusNotifierProvider.notifier)
-        as _FakeAuthStatusNotifier;
+    final notifier =
+        container.read(authStatusNotifierProvider.notifier)
+            as _FakeAuthStatusNotifier;
     expect(notifier.logoutCalled, isFalse);
-    expect(
-      find.text('Bạn không có quyền truy cập khu vực quản trị.'),
-      findsOneWidget,
-    );
+    expect(_currentLocation(router), '/home/personal');
+    expect(find.byType(_PersonalPlaceholder), findsOneWidget);
   });
 
-  testWidgets('AdminScreen keeps session on transient failure', (
-    WidgetTester tester,
-  ) async {
-    final container = ProviderContainer(
-      overrides: [
-        authStatusNotifierProvider.overrideWith(
-          () => _FakeAuthStatusNotifier(SessionValidationOutcome.transientFailure),
+  testWidgets(
+    'AdminScreen redirects to personal screen on transient failure',
+    (WidgetTester tester) async {
+      final container = ProviderContainer(
+        overrides: [
+          authStatusNotifierProvider.overrideWith(
+            () => _FakeAuthStatusNotifier(
+              SessionValidationOutcome.transientFailure,
+            ),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      final router = _buildTestRouter();
+      addTearDown(router.dispose);
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: MaterialApp.router(routerConfig: router),
         ),
-      ],
-    );
-    addTearDown(container.dispose);
+      );
+      await tester.pumpAndSettle();
 
-    await tester.pumpWidget(
-      UncontrolledProviderScope(
-        container: container,
-        child: const MaterialApp(home: AdminScreen()),
-      ),
-    );
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 50));
+      final notifier =
+          container.read(authStatusNotifierProvider.notifier)
+              as _FakeAuthStatusNotifier;
+      expect(notifier.logoutCalled, isFalse);
+      expect(_currentLocation(router), '/home/personal');
+      expect(find.byType(_PersonalPlaceholder), findsOneWidget);
+    },
+  );
+}
 
-    final notifier = container.read(authStatusNotifierProvider.notifier)
-        as _FakeAuthStatusNotifier;
-    expect(notifier.logoutCalled, isFalse);
-    expect(
-      find.text(
-        'Không thể xác thực phiên do mạng không ổn định. Vui lòng thử lại.',
+GoRouter _buildTestRouter() {
+  return GoRouter(
+    initialLocation: '/admin',
+    routes: [
+      GoRoute(path: '/admin', builder: (_, _) => const AdminScreen()),
+      GoRoute(
+        path: '/home/personal',
+        builder: (_, _) => const _PersonalPlaceholder(),
       ),
-      findsOneWidget,
-    );
-  });
+    ],
+  );
+}
+
+String _currentLocation(GoRouter router) {
+  return router.routerDelegate.currentConfiguration.uri.toString();
+}
+
+class _PersonalPlaceholder extends StatelessWidget {
+  const _PersonalPlaceholder();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(body: Center(child: Text('personal-placeholder')));
+  }
 }
 
 class _FakeAuthStatusNotifier extends AuthStatusNotifier {

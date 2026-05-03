@@ -3,12 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zola/ui/features/auth/view_models/auth_status_providers.dart';
-import 'package:zola/ui/features/auth/view_models/auth_status_view_model.dart';
-import 'package:zola/ui/features/auth/views/auth_required_view.dart';
-import 'package:zola/ui/features/auth/views/banned_view.dart';
-import 'package:zola/ui/features/auth/views/login_view.dart';
-import 'package:zola/ui/core/widgets/linear_loading_placeholder.dart';
-import 'package:zola/ui/features/home/views/home_view.dart';
+import 'package:zola/ui/routing/app_router.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -53,20 +48,13 @@ class _AppState extends ConsumerState<App> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    final authStatus = ref.watch(authStatusNotifierProvider);
-    final Widget homeChild = switch (authStatus) {
-      AuthStatus.checking => const _AuthLoadingView(),
-      AuthStatus.sessionRecoveryRequired => const AuthRequiredView(),
-      AuthStatus.authenticated => const HomeView(),
-      AuthStatus.banned => const BannedView(),
-      AuthStatus.unauthenticated => const LoginView(),
-    };
-    return MaterialApp(
-      key: ValueKey<AuthStatus>(authStatus),
+    final router = ref.watch(appRouterProvider);
+    return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       title: 'Zola',
       themeMode: _themeMode,
       theme: _buildLightTheme(),
+      routerConfig: router,
       builder: (context, child) {
         final logoutOverlay = ref.watch(logoutInProgressProvider);
         final belowAppBarTop =
@@ -80,7 +68,7 @@ class _AppState extends ConsumerState<App> with WidgetsBindingObserver {
                 left: 0,
                 right: 0,
                 top: belowAppBarTop,
-                child: SizedBox(
+                child: const SizedBox(
                   height: 3,
                   child: LinearProgressIndicator(minHeight: 3),
                 ),
@@ -88,31 +76,10 @@ class _AppState extends ConsumerState<App> with WidgetsBindingObserver {
           ],
         );
       },
-      home: homeChild,
     );
   }
 
   ThemeData _buildLightTheme() {
     return ThemeData(useMaterial3: _useMaterial3, brightness: Brightness.light);
-  }
-
-  // ThemeData _buildDarkTheme() {
-  //   return ThemeData(
-  //     colorSchemeSeed:
-  //         state.colorSelectionMethod == ColorSelectionMethod.colorSeed
-  //         ? state.colorSelected.color
-  //         : state.imageColorScheme.primary,
-  //     useMaterial3: _useMaterial3,
-  //     brightness: Brightness.dark,
-  //   );
-  // }
-}
-
-class _AuthLoadingView extends StatelessWidget {
-  const _AuthLoadingView();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(body: LinearLoadingScaffoldBody());
   }
 }

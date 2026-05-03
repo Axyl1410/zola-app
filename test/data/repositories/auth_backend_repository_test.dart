@@ -115,9 +115,7 @@ void main() {
 class _FakeAuthRemoteService extends AuthRemoteService {
   _FakeAuthRemoteService({this.signInResponse, this.signOutResponse})
     : super(
-        apiClient: ApiClient(
-          authTokenProvider: _FakeAuthSessionRepository(),
-        ),
+        apiClient: ApiClient(authTokenProvider: _FakeAuthSessionRepository()),
       );
 
   bool called = false;

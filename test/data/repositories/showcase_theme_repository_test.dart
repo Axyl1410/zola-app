@@ -7,7 +7,9 @@ void main() {
   group('ShowcaseThemeRepository', () {
     test('delegates image url to service and returns scheme', () async {
       final fakeService = _FakeColorSchemeService();
-      final repository = ShowcaseThemeRepository(colorSchemeService: fakeService);
+      final repository = ShowcaseThemeRepository(
+        colorSchemeService: fakeService,
+      );
 
       final result = await repository.getColorSchemeFromImageUrl(
         'https://example.com/image.png',

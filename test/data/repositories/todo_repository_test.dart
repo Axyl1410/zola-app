@@ -27,9 +27,7 @@ void main() {
 class _FakeTodoRemoteService extends TodoRemoteService {
   _FakeTodoRemoteService()
     : super(
-        apiClient: ApiClient(
-          authTokenProvider: _FakeAuthSessionRepository(),
-        ),
+        apiClient: ApiClient(authTokenProvider: _FakeAuthSessionRepository()),
       );
 
   int? lastRequestedId;

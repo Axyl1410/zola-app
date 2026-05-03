@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:zola/domain/models/auth_user.dart';
 import 'package:zola/ui/features/auth/view_models/auth_status_providers.dart';
 import 'package:zola/ui/features/auth/view_models/auth_status_view_model.dart';
 import 'package:zola/ui/features/auth/view_models/current_user_provider.dart';
 import 'package:zola/ui/features/admin/view_models/admin_users_view_model.dart';
-import 'package:zola/ui/features/admin/views/screens/admin_users_screen.dart';
+import 'package:zola/ui/routing/app_routes.dart';
 
 class AdminScreen extends ConsumerStatefulWidget {
   const AdminScreen({super.key});
@@ -40,7 +41,7 @@ class _AdminScreenState extends ConsumerState<AdminScreen> {
               content: Text('Bạn không có quyền truy cập khu vực quản trị.'),
             ),
           );
-          Navigator.of(context).maybePop();
+          context.go(AppRoute.homePersonal);
           return false;
         }
         return true;
@@ -57,7 +58,7 @@ class _AdminScreenState extends ConsumerState<AdminScreen> {
             ),
           ),
         );
-        Navigator.of(context).maybePop();
+        context.go(AppRoute.homePersonal);
         return false;
     }
   }
@@ -94,7 +95,7 @@ class _AdminScreenState extends ConsumerState<AdminScreen> {
         ),
         leading: IconButton(
           onPressed: () {
-            Navigator.pop(context);
+            context.go(AppRoute.homePersonal);
           },
           icon: const Icon(Icons.arrow_back, color: Colors.white),
         ),
@@ -123,12 +124,7 @@ class _AdminScreenState extends ConsumerState<AdminScreen> {
                 if (!context.mounted || !allowed) {
                   return;
                 }
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const AdminUsersScreen(),
-                  ),
-                );
+                context.go(AppRoute.adminUsers);
               },
               icon: const Icon(Icons.people_alt_outlined),
               label: const Text('Quản lý người dùng'),

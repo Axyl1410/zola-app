@@ -26,7 +26,9 @@ void main() {
       final container = ProviderContainer(
         overrides: [
           authSessionRepositoryProvider.overrideWithValue(fakeRepository),
-          authBackendRepositoryProvider.overrideWithValue(fakeBackendRepository),
+          authBackendRepositoryProvider.overrideWithValue(
+            fakeBackendRepository,
+          ),
         ],
       );
       addTearDown(container.dispose);
@@ -42,14 +44,18 @@ void main() {
     });
 
     test('build does not trigger refresh automatically', () async {
-      final fakeRepository = _FakeAuthSessionRepository(validToken: 'token-123');
+      final fakeRepository = _FakeAuthSessionRepository(
+        validToken: 'token-123',
+      );
       final fakeBackendRepository = _FakeAuthBackendRepository(
         sessionResult: _defaultSessionResult(),
       );
       final container = ProviderContainer(
         overrides: [
           authSessionRepositoryProvider.overrideWithValue(fakeRepository),
-          authBackendRepositoryProvider.overrideWithValue(fakeBackendRepository),
+          authBackendRepositoryProvider.overrideWithValue(
+            fakeBackendRepository,
+          ),
         ],
       );
       addTearDown(container.dispose);
@@ -68,7 +74,9 @@ void main() {
       final container = ProviderContainer(
         overrides: [
           authSessionRepositoryProvider.overrideWithValue(fakeRepository),
-          authBackendRepositoryProvider.overrideWithValue(fakeBackendRepository),
+          authBackendRepositoryProvider.overrideWithValue(
+            fakeBackendRepository,
+          ),
         ],
       );
       addTearDown(container.dispose);
@@ -87,7 +95,9 @@ void main() {
     test(
       'refreshAuthStatus sets sessionRecoveryRequired when startup is checking and backend returns non-401',
       () async {
-        final fakeRepository = _FakeAuthSessionRepository(validToken: 'token-123');
+        final fakeRepository = _FakeAuthSessionRepository(
+          validToken: 'token-123',
+        );
         final fakeBackendRepository = _FakeAuthBackendRepository(
           sessionError: const AuthBackendHttpException(
             statusCode: 500,
@@ -97,7 +107,9 @@ void main() {
         final container = ProviderContainer(
           overrides: [
             authSessionRepositoryProvider.overrideWithValue(fakeRepository),
-            authBackendRepositoryProvider.overrideWithValue(fakeBackendRepository),
+            authBackendRepositoryProvider.overrideWithValue(
+              fakeBackendRepository,
+            ),
           ],
         );
         addTearDown(container.dispose);
@@ -121,7 +133,9 @@ void main() {
       final container = ProviderContainer(
         overrides: [
           authSessionRepositoryProvider.overrideWithValue(fakeRepository),
-          authBackendRepositoryProvider.overrideWithValue(fakeBackendRepository),
+          authBackendRepositoryProvider.overrideWithValue(
+            fakeBackendRepository,
+          ),
         ],
       );
       addTearDown(container.dispose);
@@ -145,7 +159,9 @@ void main() {
       final container = ProviderContainer(
         overrides: [
           authSessionRepositoryProvider.overrideWithValue(fakeRepository),
-          authBackendRepositoryProvider.overrideWithValue(fakeBackendRepository),
+          authBackendRepositoryProvider.overrideWithValue(
+            fakeBackendRepository,
+          ),
         ],
       );
       addTearDown(container.dispose);
@@ -167,7 +183,9 @@ void main() {
       final container = ProviderContainer(
         overrides: [
           authSessionRepositoryProvider.overrideWithValue(fakeRepository),
-          authBackendRepositoryProvider.overrideWithValue(fakeBackendRepository),
+          authBackendRepositoryProvider.overrideWithValue(
+            fakeBackendRepository,
+          ),
         ],
       );
       addTearDown(container.dispose);
@@ -181,36 +199,50 @@ void main() {
       );
     });
 
-    test('logout notifies backend before clearing local session by default', () async {
-      final fakeRepository = _FakeAuthSessionRepository(validToken: 'token-123');
-      final fakeBackendRepository = _FakeAuthBackendRepository(
-        sessionResult: _defaultSessionResult(),
-      );
-      final container = ProviderContainer(
-        overrides: [
-          authSessionRepositoryProvider.overrideWithValue(fakeRepository),
-          authBackendRepositoryProvider.overrideWithValue(fakeBackendRepository),
-        ],
-      );
-      addTearDown(container.dispose);
+    test(
+      'logout notifies backend before clearing local session by default',
+      () async {
+        final fakeRepository = _FakeAuthSessionRepository(
+          validToken: 'token-123',
+        );
+        final fakeBackendRepository = _FakeAuthBackendRepository(
+          sessionResult: _defaultSessionResult(),
+        );
+        final container = ProviderContainer(
+          overrides: [
+            authSessionRepositoryProvider.overrideWithValue(fakeRepository),
+            authBackendRepositoryProvider.overrideWithValue(
+              fakeBackendRepository,
+            ),
+          ],
+        );
+        addTearDown(container.dispose);
 
-      await container.read(authStatusNotifierProvider.notifier).logout();
+        await container.read(authStatusNotifierProvider.notifier).logout();
 
-      expect(fakeBackendRepository.signOutCallCount, 1);
-      expect(fakeBackendRepository.lastSignOutToken, 'token-123');
-      expect(fakeRepository.clearCalled, isTrue);
-      expect(container.read(authStatusNotifierProvider), AuthStatus.unauthenticated);
-    });
+        expect(fakeBackendRepository.signOutCallCount, 1);
+        expect(fakeBackendRepository.lastSignOutToken, 'token-123');
+        expect(fakeRepository.clearCalled, isTrue);
+        expect(
+          container.read(authStatusNotifierProvider),
+          AuthStatus.unauthenticated,
+        );
+      },
+    );
 
     test('logout with notifyBackend false skips backend signOut', () async {
-      final fakeRepository = _FakeAuthSessionRepository(validToken: 'token-123');
+      final fakeRepository = _FakeAuthSessionRepository(
+        validToken: 'token-123',
+      );
       final fakeBackendRepository = _FakeAuthBackendRepository(
         sessionResult: _defaultSessionResult(),
       );
       final container = ProviderContainer(
         overrides: [
           authSessionRepositoryProvider.overrideWithValue(fakeRepository),
-          authBackendRepositoryProvider.overrideWithValue(fakeBackendRepository),
+          authBackendRepositoryProvider.overrideWithValue(
+            fakeBackendRepository,
+          ),
         ],
       );
       addTearDown(container.dispose);
@@ -221,38 +253,53 @@ void main() {
 
       expect(fakeBackendRepository.signOutCallCount, 0);
       expect(fakeRepository.clearCalled, isTrue);
-      expect(container.read(authStatusNotifierProvider), AuthStatus.unauthenticated);
+      expect(
+        container.read(authStatusNotifierProvider),
+        AuthStatus.unauthenticated,
+      );
     });
 
-    test('ensureSessionActiveForCriticalAction logs out when backend returns 401', () async {
-      final fakeRepository = _FakeAuthSessionRepository(validToken: 'token-123');
-      final fakeBackendRepository = _FakeAuthBackendRepository(
-        sessionError: const AuthBackendHttpException(
-          statusCode: 401,
-          message: 'Unauthorized',
-        ),
-      );
-      final container = ProviderContainer(
-        overrides: [
-          authSessionRepositoryProvider.overrideWithValue(fakeRepository),
-          authBackendRepositoryProvider.overrideWithValue(fakeBackendRepository),
-        ],
-      );
-      addTearDown(container.dispose);
+    test(
+      'ensureSessionActiveForCriticalAction logs out when backend returns 401',
+      () async {
+        final fakeRepository = _FakeAuthSessionRepository(
+          validToken: 'token-123',
+        );
+        final fakeBackendRepository = _FakeAuthBackendRepository(
+          sessionError: const AuthBackendHttpException(
+            statusCode: 401,
+            message: 'Unauthorized',
+          ),
+        );
+        final container = ProviderContainer(
+          overrides: [
+            authSessionRepositoryProvider.overrideWithValue(fakeRepository),
+            authBackendRepositoryProvider.overrideWithValue(
+              fakeBackendRepository,
+            ),
+          ],
+        );
+        addTearDown(container.dispose);
 
-      final isActive = await container
-          .read(authStatusNotifierProvider.notifier)
-          .ensureSessionActiveForCriticalAction();
+        final isActive = await container
+            .read(authStatusNotifierProvider.notifier)
+            .ensureSessionActiveForCriticalAction();
 
-      expect(isActive, isFalse);
-      expect(fakeRepository.clearCalled, isTrue);
-      expect(container.read(authStatusNotifierProvider), AuthStatus.unauthenticated);
-    });
+        expect(isActive, isFalse);
+        expect(fakeRepository.clearCalled, isTrue);
+        expect(
+          container.read(authStatusNotifierProvider),
+          AuthStatus.unauthenticated,
+        );
+      },
+    );
 
     test(
       'ensureSessionActiveForCriticalAction keeps authenticated state on non-401 critical failure',
       () async {
-        final fakeRepository = _FakeAuthSessionRepository(validToken: 'token-123');
+        final fakeRepository = _FakeAuthSessionRepository(
+          validToken: 'token-123',
+        );
         final fakeBackendRepository = _FakeAuthBackendRepository(
           sessionError: const AuthBackendHttpException(
             statusCode: 500,
@@ -262,7 +309,9 @@ void main() {
         final container = ProviderContainer(
           overrides: [
             authSessionRepositoryProvider.overrideWithValue(fakeRepository),
-            authBackendRepositoryProvider.overrideWithValue(fakeBackendRepository),
+            authBackendRepositoryProvider.overrideWithValue(
+              fakeBackendRepository,
+            ),
           ],
         );
         addTearDown(container.dispose);
@@ -277,7 +326,10 @@ void main() {
 
         expect(isActive, isFalse);
         expect(fakeRepository.clearCalled, isFalse);
-        expect(container.read(authStatusNotifierProvider), AuthStatus.authenticated);
+        expect(
+          container.read(authStatusNotifierProvider),
+          AuthStatus.authenticated,
+        );
       },
     );
 
@@ -303,7 +355,9 @@ void main() {
       final container = ProviderContainer(
         overrides: [
           authSessionRepositoryProvider.overrideWithValue(fakeRepository),
-          authBackendRepositoryProvider.overrideWithValue(fakeBackendRepository),
+          authBackendRepositoryProvider.overrideWithValue(
+            fakeBackendRepository,
+          ),
         ],
       );
       addTearDown(container.dispose);
@@ -324,113 +378,12 @@ void main() {
       expect(container.read(authStatusNotifierProvider), AuthStatus.banned);
     });
 
-    test('ensureSessionActiveForCriticalAction sets banned status when server user is banned', () async {
-      final fakeRepository = _FakeAuthSessionRepository(validToken: 'token-123');
-      final fakeBackendRepository = _FakeAuthBackendRepository(
-        sessionResult: AuthBackendSessionResult(
-          statusCode: 200,
-          session: const AuthBackendSession(
-            id: 's_1',
-            expiresAt: '2099-05-01T00:00:00.000Z',
-            token: 'token-123',
-          ),
-          user: const AuthUser(
-            id: 'u_2',
-            name: 'Banned By Server',
-            email: 'server-banned@zola.app',
-            emailVerified: true,
-            banned: true,
-          ),
-        ),
-      );
-      final container = ProviderContainer(
-        overrides: [
-          authSessionRepositoryProvider.overrideWithValue(fakeRepository),
-          authBackendRepositoryProvider.overrideWithValue(fakeBackendRepository),
-        ],
-      );
-      addTearDown(container.dispose);
-
-      final isActive = await container
-          .read(authStatusNotifierProvider.notifier)
-          .ensureSessionActiveForCriticalAction();
-
-      expect(isActive, isFalse);
-      expect(container.read(authStatusNotifierProvider), AuthStatus.banned);
-    });
-
-    test('ensureSessionActiveForLifecycle keeps banned state on non-401 error', () async {
-      final fakeRepository = _FakeAuthSessionRepository(validToken: null);
-      final fakeBackendRepository = _FakeAuthBackendRepository(
-        sessionError: const AuthBackendHttpException(
-          statusCode: 500,
-          message: 'Internal server error',
-        ),
-      );
-      final container = ProviderContainer(
-        overrides: [
-          authSessionRepositoryProvider.overrideWithValue(fakeRepository),
-          authBackendRepositoryProvider.overrideWithValue(fakeBackendRepository),
-        ],
-      );
-      addTearDown(container.dispose);
-
-      await container
-          .read(authStatusNotifierProvider.notifier)
-          .markAuthenticated(
-            'new-token',
-            user: const AuthUser(
-              id: 'u_banned',
-              name: 'Banned User',
-              email: 'banned@zola.app',
-              emailVerified: true,
-              banned: true,
-            ),
-          );
-
-      final isActive = await container
-          .read(authStatusNotifierProvider.notifier)
-          .ensureSessionActiveForLifecycle();
-
-      expect(isActive, isFalse);
-      expect(container.read(authStatusNotifierProvider), AuthStatus.banned);
-    });
-
-    test('ensureSessionActiveForLifecycle keeps authenticated on non-401 error', () async {
-      final fakeRepository = _FakeAuthSessionRepository(validToken: null);
-      final fakeBackendRepository = _FakeAuthBackendRepository(
-        sessionError: const AuthBackendHttpException(
-          statusCode: 500,
-          message: 'Internal server error',
-        ),
-      );
-      final container = ProviderContainer(
-        overrides: [
-          authSessionRepositoryProvider.overrideWithValue(fakeRepository),
-          authBackendRepositoryProvider.overrideWithValue(fakeBackendRepository),
-        ],
-      );
-      addTearDown(container.dispose);
-
-      await container
-          .read(authStatusNotifierProvider.notifier)
-          .markAuthenticated('new-token');
-
-      final isActive = await container
-          .read(authStatusNotifierProvider.notifier)
-          .ensureSessionActiveForLifecycle();
-
-      expect(isActive, isTrue);
-      expect(
-        container.read(authStatusNotifierProvider),
-        AuthStatus.authenticated,
-      );
-    });
-
     test(
-      'validateSessionForCriticalAction returns banned outcome for banned server user',
+      'ensureSessionActiveForCriticalAction sets banned status when server user is banned',
       () async {
-        final fakeRepository = _FakeAuthSessionRepository(validToken: 'token-123');
+        final fakeRepository = _FakeAuthSessionRepository(
+          validToken: 'token-123',
+        );
         final fakeBackendRepository = _FakeAuthBackendRepository(
           sessionResult: AuthBackendSessionResult(
             statusCode: 200,
@@ -451,7 +404,129 @@ void main() {
         final container = ProviderContainer(
           overrides: [
             authSessionRepositoryProvider.overrideWithValue(fakeRepository),
-            authBackendRepositoryProvider.overrideWithValue(fakeBackendRepository),
+            authBackendRepositoryProvider.overrideWithValue(
+              fakeBackendRepository,
+            ),
+          ],
+        );
+        addTearDown(container.dispose);
+
+        final isActive = await container
+            .read(authStatusNotifierProvider.notifier)
+            .ensureSessionActiveForCriticalAction();
+
+        expect(isActive, isFalse);
+        expect(container.read(authStatusNotifierProvider), AuthStatus.banned);
+      },
+    );
+
+    test(
+      'ensureSessionActiveForLifecycle keeps banned state on non-401 error',
+      () async {
+        final fakeRepository = _FakeAuthSessionRepository(validToken: null);
+        final fakeBackendRepository = _FakeAuthBackendRepository(
+          sessionError: const AuthBackendHttpException(
+            statusCode: 500,
+            message: 'Internal server error',
+          ),
+        );
+        final container = ProviderContainer(
+          overrides: [
+            authSessionRepositoryProvider.overrideWithValue(fakeRepository),
+            authBackendRepositoryProvider.overrideWithValue(
+              fakeBackendRepository,
+            ),
+          ],
+        );
+        addTearDown(container.dispose);
+
+        await container
+            .read(authStatusNotifierProvider.notifier)
+            .markAuthenticated(
+              'new-token',
+              user: const AuthUser(
+                id: 'u_banned',
+                name: 'Banned User',
+                email: 'banned@zola.app',
+                emailVerified: true,
+                banned: true,
+              ),
+            );
+
+        final isActive = await container
+            .read(authStatusNotifierProvider.notifier)
+            .ensureSessionActiveForLifecycle();
+
+        expect(isActive, isFalse);
+        expect(container.read(authStatusNotifierProvider), AuthStatus.banned);
+      },
+    );
+
+    test(
+      'ensureSessionActiveForLifecycle keeps authenticated on non-401 error',
+      () async {
+        final fakeRepository = _FakeAuthSessionRepository(validToken: null);
+        final fakeBackendRepository = _FakeAuthBackendRepository(
+          sessionError: const AuthBackendHttpException(
+            statusCode: 500,
+            message: 'Internal server error',
+          ),
+        );
+        final container = ProviderContainer(
+          overrides: [
+            authSessionRepositoryProvider.overrideWithValue(fakeRepository),
+            authBackendRepositoryProvider.overrideWithValue(
+              fakeBackendRepository,
+            ),
+          ],
+        );
+        addTearDown(container.dispose);
+
+        await container
+            .read(authStatusNotifierProvider.notifier)
+            .markAuthenticated('new-token');
+
+        final isActive = await container
+            .read(authStatusNotifierProvider.notifier)
+            .ensureSessionActiveForLifecycle();
+
+        expect(isActive, isTrue);
+        expect(
+          container.read(authStatusNotifierProvider),
+          AuthStatus.authenticated,
+        );
+      },
+    );
+
+    test(
+      'validateSessionForCriticalAction returns banned outcome for banned server user',
+      () async {
+        final fakeRepository = _FakeAuthSessionRepository(
+          validToken: 'token-123',
+        );
+        final fakeBackendRepository = _FakeAuthBackendRepository(
+          sessionResult: AuthBackendSessionResult(
+            statusCode: 200,
+            session: const AuthBackendSession(
+              id: 's_1',
+              expiresAt: '2099-05-01T00:00:00.000Z',
+              token: 'token-123',
+            ),
+            user: const AuthUser(
+              id: 'u_2',
+              name: 'Banned By Server',
+              email: 'server-banned@zola.app',
+              emailVerified: true,
+              banned: true,
+            ),
+          ),
+        );
+        final container = ProviderContainer(
+          overrides: [
+            authSessionRepositoryProvider.overrideWithValue(fakeRepository),
+            authBackendRepositoryProvider.overrideWithValue(
+              fakeBackendRepository,
+            ),
           ],
         );
         addTearDown(container.dispose);
@@ -465,80 +540,98 @@ void main() {
       },
     );
 
-    test('refreshAuthStatus reconciles token and backend expiry into local session', () async {
-      final fakeRepository = _FakeAuthSessionRepository(validToken: 'token-123');
-      final fakeBackendRepository = _FakeAuthBackendRepository(
-        sessionResult: AuthBackendSessionResult(
-          statusCode: 200,
-          session: const AuthBackendSession(
-            id: 's_9',
-            expiresAt: '2099-05-15T10:30:00.000Z',
-            token: 'rotated-token',
-            createdAt: '2026-05-01T10:30:00.000Z',
+    test(
+      'refreshAuthStatus reconciles token and backend expiry into local session',
+      () async {
+        final fakeRepository = _FakeAuthSessionRepository(
+          validToken: 'token-123',
+        );
+        final fakeBackendRepository = _FakeAuthBackendRepository(
+          sessionResult: AuthBackendSessionResult(
+            statusCode: 200,
+            session: const AuthBackendSession(
+              id: 's_9',
+              expiresAt: '2099-05-15T10:30:00.000Z',
+              token: 'rotated-token',
+              createdAt: '2026-05-01T10:30:00.000Z',
+            ),
+            user: const AuthUser(
+              id: 'u_9',
+              name: 'User',
+              email: 'user@zola.app',
+              emailVerified: true,
+            ),
           ),
-          user: const AuthUser(
-            id: 'u_9',
-            name: 'User',
-            email: 'user@zola.app',
-            emailVerified: true,
-          ),
-        ),
-      );
-      final container = ProviderContainer(
-        overrides: [
-          authSessionRepositoryProvider.overrideWithValue(fakeRepository),
-          authBackendRepositoryProvider.overrideWithValue(fakeBackendRepository),
-        ],
-      );
-      addTearDown(container.dispose);
+        );
+        final container = ProviderContainer(
+          overrides: [
+            authSessionRepositoryProvider.overrideWithValue(fakeRepository),
+            authBackendRepositoryProvider.overrideWithValue(
+              fakeBackendRepository,
+            ),
+          ],
+        );
+        addTearDown(container.dispose);
 
-      await container
-          .read(authStatusNotifierProvider.notifier)
-          .refreshAuthStatus();
+        await container
+            .read(authStatusNotifierProvider.notifier)
+            .refreshAuthStatus();
 
-      expect(fakeRepository.savedToken, 'rotated-token');
-      expect(
-        fakeRepository.savedSessionExpiresAt,
-        DateTime.parse('2099-05-15T10:30:00.000Z').toUtc(),
-      );
-      expect(
-        container.read(authStatusNotifierProvider),
-        AuthStatus.authenticated,
-      );
-    });
+        expect(fakeRepository.savedToken, 'rotated-token');
+        expect(
+          fakeRepository.savedSessionExpiresAt,
+          DateTime.parse('2099-05-15T10:30:00.000Z').toUtc(),
+        );
+        expect(
+          container.read(authStatusNotifierProvider),
+          AuthStatus.authenticated,
+        );
+      },
+    );
 
-    test('ensureSessionActiveForCriticalAction uses short-lived cache', () async {
-      final fakeRepository = _FakeAuthSessionRepository(validToken: 'token-123');
-      final fakeBackendRepository = _FakeAuthBackendRepository(
-        sessionResult: _defaultSessionResult(),
-      );
-      final container = ProviderContainer(
-        overrides: [
-          authSessionRepositoryProvider.overrideWithValue(fakeRepository),
-          authBackendRepositoryProvider.overrideWithValue(fakeBackendRepository),
-        ],
-      );
-      addTearDown(container.dispose);
+    test(
+      'ensureSessionActiveForCriticalAction uses short-lived cache',
+      () async {
+        final fakeRepository = _FakeAuthSessionRepository(
+          validToken: 'token-123',
+        );
+        final fakeBackendRepository = _FakeAuthBackendRepository(
+          sessionResult: _defaultSessionResult(),
+        );
+        final container = ProviderContainer(
+          overrides: [
+            authSessionRepositoryProvider.overrideWithValue(fakeRepository),
+            authBackendRepositoryProvider.overrideWithValue(
+              fakeBackendRepository,
+            ),
+          ],
+        );
+        addTearDown(container.dispose);
 
-      final notifier = container.read(authStatusNotifierProvider.notifier);
-      final first = await notifier.ensureSessionActiveForCriticalAction();
-      final afterFirst = fakeBackendRepository.getSessionCallCount;
-      final second = await notifier.ensureSessionActiveForCriticalAction();
+        final notifier = container.read(authStatusNotifierProvider.notifier);
+        final first = await notifier.ensureSessionActiveForCriticalAction();
+        final afterFirst = fakeBackendRepository.getSessionCallCount;
+        final second = await notifier.ensureSessionActiveForCriticalAction();
 
-      expect(first, isTrue);
-      expect(second, isTrue);
-      expect(fakeBackendRepository.getSessionCallCount, afterFirst);
-    });
+        expect(first, isTrue);
+        expect(second, isTrue);
+        expect(fakeBackendRepository.getSessionCallCount, afterFirst);
+      },
+    );
 
     test('critical validation cache resets after markAuthenticated', () async {
-      final fakeRepository = _FakeAuthSessionRepository(validToken: 'token-123');
+      final fakeRepository = _FakeAuthSessionRepository(
+        validToken: 'token-123',
+      );
       final fakeBackendRepository = _FakeAuthBackendRepository(
         sessionResult: _defaultSessionResult(),
       );
       final container = ProviderContainer(
         overrides: [
           authSessionRepositoryProvider.overrideWithValue(fakeRepository),
-          authBackendRepositoryProvider.overrideWithValue(fakeBackendRepository),
+          authBackendRepositoryProvider.overrideWithValue(
+            fakeBackendRepository,
+          ),
         ],
       );
       addTearDown(container.dispose);
@@ -555,14 +648,18 @@ void main() {
     });
 
     test('critical validation cache resets after logout', () async {
-      final fakeRepository = _FakeAuthSessionRepository(validToken: 'token-123');
+      final fakeRepository = _FakeAuthSessionRepository(
+        validToken: 'token-123',
+      );
       final fakeBackendRepository = _FakeAuthBackendRepository(
         sessionResult: _defaultSessionResult(),
       );
       final container = ProviderContainer(
         overrides: [
           authSessionRepositoryProvider.overrideWithValue(fakeRepository),
-          authBackendRepositoryProvider.overrideWithValue(fakeBackendRepository),
+          authBackendRepositoryProvider.overrideWithValue(
+            fakeBackendRepository,
+          ),
         ],
       );
       addTearDown(container.dispose);
@@ -580,7 +677,9 @@ void main() {
     });
 
     test('retry after transient critical failure can recover', () async {
-      final fakeRepository = _FakeAuthSessionRepository(validToken: 'token-123');
+      final fakeRepository = _FakeAuthSessionRepository(
+        validToken: 'token-123',
+      );
       final fakeBackendRepository = _SequencedAuthBackendRepository(
         sequence: <Object>[
           const AuthBackendHttpException(
@@ -593,7 +692,9 @@ void main() {
       final container = ProviderContainer(
         overrides: [
           authSessionRepositoryProvider.overrideWithValue(fakeRepository),
-          authBackendRepositoryProvider.overrideWithValue(fakeBackendRepository),
+          authBackendRepositoryProvider.overrideWithValue(
+            fakeBackendRepository,
+          ),
         ],
       );
       addTearDown(container.dispose);
@@ -607,11 +708,16 @@ void main() {
 
       expect(first, SessionValidationOutcome.transientFailure);
       expect(second, SessionValidationOutcome.active);
-      expect(container.read(authStatusNotifierProvider), AuthStatus.authenticated);
+      expect(
+        container.read(authStatusNotifierProvider),
+        AuthStatus.authenticated,
+      );
     });
 
     test('concurrent critical validations do not break auth state', () async {
-      final fakeRepository = _FakeAuthSessionRepository(validToken: 'token-123');
+      final fakeRepository = _FakeAuthSessionRepository(
+        validToken: 'token-123',
+      );
       final fakeBackendRepository = _SequencedAuthBackendRepository(
         sequence: <Object>[
           _defaultSessionResult(),
@@ -623,7 +729,9 @@ void main() {
       final container = ProviderContainer(
         overrides: [
           authSessionRepositoryProvider.overrideWithValue(fakeRepository),
-          authBackendRepositoryProvider.overrideWithValue(fakeBackendRepository),
+          authBackendRepositoryProvider.overrideWithValue(
+            fakeBackendRepository,
+          ),
         ],
       );
       addTearDown(container.dispose);
@@ -636,9 +744,18 @@ void main() {
         ),
       );
 
-      expect(results.every((r) => r == SessionValidationOutcome.active), isTrue);
-      expect(container.read(authStatusNotifierProvider), AuthStatus.authenticated);
-      expect(fakeBackendRepository.getSessionCallCount, greaterThanOrEqualTo(1));
+      expect(
+        results.every((r) => r == SessionValidationOutcome.active),
+        isTrue,
+      );
+      expect(
+        container.read(authStatusNotifierProvider),
+        AuthStatus.authenticated,
+      );
+      expect(
+        fakeBackendRepository.getSessionCallCount,
+        greaterThanOrEqualTo(1),
+      );
       expect(fakeBackendRepository.getSessionCallCount, lessThanOrEqualTo(3));
 
       final callsAfterConcurrent = fakeBackendRepository.getSessionCallCount;
@@ -757,7 +874,9 @@ class _FakeAuthBackendRepository extends AuthBackendRepository {
   String? lastSignOutToken;
 
   @override
-  Future<AuthBackendSessionResult> getSession({required String bearerToken}) async {
+  Future<AuthBackendSessionResult> getSession({
+    required String bearerToken,
+  }) async {
     getSessionCallCount++;
     if (sessionError != null) {
       throw sessionError!;
@@ -777,11 +896,7 @@ class _FakeAuthBackendRepository extends AuthBackendRepository {
 
 class _NoopAuthRemoteService extends AuthRemoteService {
   _NoopAuthRemoteService()
-    : super(
-        apiClient: ApiClient(
-          authTokenProvider: _FakeAuthTokenProvider(),
-        ),
-      );
+    : super(apiClient: ApiClient(authTokenProvider: _FakeAuthTokenProvider()));
 
   @override
   Future<http.Response> signInWithGoogle({
@@ -828,7 +943,9 @@ class _SequencedAuthBackendRepository extends AuthBackendRepository {
   }
 
   @override
-  Future<AuthBackendSessionResult> getSession({required String bearerToken}) async {
+  Future<AuthBackendSessionResult> getSession({
+    required String bearerToken,
+  }) async {
     getSessionCallCount++;
     if (responseDelay > Duration.zero) {
       await Future<void>.delayed(responseDelay);

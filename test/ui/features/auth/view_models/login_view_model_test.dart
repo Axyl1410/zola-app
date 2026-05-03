@@ -21,19 +21,13 @@ import 'package:zola/ui/features/auth/view_models/login_providers.dart';
 void main() {
   group('LoginNotifier', () {
     test('formatTokenForLog masks token by default', () {
-      expect(
-        LoginNotifier.formatTokenForLog('backend-jwt'),
-        'backen***-jwt',
-      );
+      expect(LoginNotifier.formatTokenForLog('backend-jwt'), 'backen***-jwt');
       expect(LoginNotifier.formatTokenForLog('1234567890'), '12***');
     });
 
     test('formatTokenForLog returns full token when enabled', () {
       expect(
-        LoginNotifier.formatTokenForLog(
-          'backend-jwt',
-          logFullToken: true,
-        ),
+        LoginNotifier.formatTokenForLog('backend-jwt', logFullToken: true),
         'backend-jwt',
       );
     });
@@ -107,7 +101,9 @@ void main() {
               ),
             ),
             authSessionRepositoryProvider.overrideWithValue(recordingRepo),
-            authStatusNotifierProvider.overrideWith(_FakeAuthStatusNotifier.new),
+            authStatusNotifierProvider.overrideWith(
+              _FakeAuthStatusNotifier.new,
+            ),
           ],
         );
         addTearDown(container.dispose);
@@ -142,7 +138,9 @@ void main() {
               ),
             ),
             authSessionRepositoryProvider.overrideWithValue(recordingRepo),
-            authStatusNotifierProvider.overrideWith(_FakeAuthStatusNotifier.new),
+            authStatusNotifierProvider.overrideWith(
+              _FakeAuthStatusNotifier.new,
+            ),
           ],
         );
         addTearDown(container.dispose);
@@ -206,9 +204,7 @@ class _FakeAuthBackendRepository extends AuthBackendRepository {
 class _NoopAuthRemoteService extends AuthRemoteService {
   _NoopAuthRemoteService()
     : super(
-        apiClient: ApiClient(
-          authTokenProvider: _FakeAuthSessionRepository(),
-        ),
+        apiClient: ApiClient(authTokenProvider: _FakeAuthSessionRepository()),
       );
 
   @override
@@ -246,7 +242,8 @@ class _RecordingAuthSessionRepository extends AuthSessionRepository {
 }
 
 class _InMemorySecureStorageService extends SecureStorageService {
-  _InMemorySecureStorageService() : super(storage: const FlutterSecureStorage());
+  _InMemorySecureStorageService()
+    : super(storage: const FlutterSecureStorage());
 
   final Map<String, String> _store = <String, String>{};
 

@@ -51,9 +51,7 @@ class _FakeTodoRepository extends TodoRepository {
   _FakeTodoRepository({this.throwOnFetch = false})
     : super(
         todoRemoteService: TodoRemoteService(
-          apiClient: ApiClient(
-          authTokenProvider: _FakeAuthSessionRepository(),
-          ),
+          apiClient: ApiClient(authTokenProvider: _FakeAuthSessionRepository()),
         ),
       );
 

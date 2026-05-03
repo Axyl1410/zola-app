@@ -15,9 +15,7 @@ void main() {
         capturedRequest = request;
         return http.Response('{}', 200);
       });
-      final authRepository = _FakeAuthTokenProvider(
-        tokenToReturn: 'abc-token',
-      );
+      final authRepository = _FakeAuthTokenProvider(tokenToReturn: 'abc-token');
       final apiClient = ApiClient(
         authTokenProvider: authRepository,
         httpClient: mockClient,
@@ -29,29 +27,38 @@ void main() {
         capturedRequest.headers[HttpHeaders.authorizationHeader],
         'Bearer abc-token',
       );
-      expect(capturedRequest.headers[HttpHeaders.acceptHeader], 'application/json');
-    });
-
-    test('get does not attach authorization header when token is null', () async {
-      late http.Request capturedRequest;
-      final mockClient = MockClient((request) async {
-        capturedRequest = request;
-        return http.Response('{}', 200);
-      });
-      final authRepository = _FakeAuthTokenProvider(tokenToReturn: null);
-      final apiClient = ApiClient(
-        authTokenProvider: authRepository,
-        httpClient: mockClient,
-      );
-
-      await apiClient.get(Uri.parse('https://example.com/public'));
-
       expect(
-        capturedRequest.headers.containsKey(HttpHeaders.authorizationHeader),
-        isFalse,
+        capturedRequest.headers[HttpHeaders.acceptHeader],
+        'application/json',
       );
-      expect(capturedRequest.headers[HttpHeaders.acceptHeader], 'application/json');
     });
+
+    test(
+      'get does not attach authorization header when token is null',
+      () async {
+        late http.Request capturedRequest;
+        final mockClient = MockClient((request) async {
+          capturedRequest = request;
+          return http.Response('{}', 200);
+        });
+        final authRepository = _FakeAuthTokenProvider(tokenToReturn: null);
+        final apiClient = ApiClient(
+          authTokenProvider: authRepository,
+          httpClient: mockClient,
+        );
+
+        await apiClient.get(Uri.parse('https://example.com/public'));
+
+        expect(
+          capturedRequest.headers.containsKey(HttpHeaders.authorizationHeader),
+          isFalse,
+        );
+        expect(
+          capturedRequest.headers[HttpHeaders.acceptHeader],
+          'application/json',
+        );
+      },
+    );
 
     test('post encodes map body and sets json content-type', () async {
       late http.Request capturedRequest;
@@ -104,7 +111,10 @@ void main() {
 
       expect(capturedRequest.method, 'PUT');
       expect(capturedRequest.headers['x-request-id'], 'req-1');
-      expect(capturedRequest.headers[HttpHeaders.acceptHeader], 'application/json');
+      expect(
+        capturedRequest.headers[HttpHeaders.acceptHeader],
+        'application/json',
+      );
       expect(
         capturedRequest.headers[HttpHeaders.contentTypeHeader],
         'application/json',

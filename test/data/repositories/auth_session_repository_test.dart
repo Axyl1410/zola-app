@@ -25,10 +25,24 @@ void main() {
       expect(result.token, 'repo-token');
       expect(result.expiresAt.difference(result.receivedAt), ttl);
       expect(fakeService.storage['auth.token'], 'repo-token');
-      expect(fakeService.storage['auth.receivedAt'], result.receivedAt.toIso8601String());
-      expect(fakeService.storage['auth.expiresAt'], result.expiresAt.toIso8601String());
-      expect(result.receivedAt.isAfter(beforeCall) || result.receivedAt.isAtSameMomentAs(beforeCall), isTrue);
-      expect(result.receivedAt.isBefore(afterCall) || result.receivedAt.isAtSameMomentAs(afterCall), isTrue);
+      expect(
+        fakeService.storage['auth.receivedAt'],
+        result.receivedAt.toIso8601String(),
+      );
+      expect(
+        fakeService.storage['auth.expiresAt'],
+        result.expiresAt.toIso8601String(),
+      );
+      expect(
+        result.receivedAt.isAfter(beforeCall) ||
+            result.receivedAt.isAtSameMomentAs(beforeCall),
+        isTrue,
+      );
+      expect(
+        result.receivedAt.isBefore(afterCall) ||
+            result.receivedAt.isAtSameMomentAs(afterCall),
+        isTrue,
+      );
     });
 
     test('saveToken uses repository default ttl when omitted', () async {
@@ -52,8 +66,14 @@ void main() {
       );
 
       expect(fakeService.storage['auth.token'], 'server-token');
-      expect(fakeService.storage['auth.receivedAt'], receivedAt.toIso8601String());
-      expect(fakeService.storage['auth.expiresAt'], expiresAt.toIso8601String());
+      expect(
+        fakeService.storage['auth.receivedAt'],
+        receivedAt.toIso8601String(),
+      );
+      expect(
+        fakeService.storage['auth.expiresAt'],
+        expiresAt.toIso8601String(),
+      );
       expect(result.token, 'server-token');
       expect(result.expiresAt, expiresAt);
     });
@@ -65,8 +85,10 @@ void main() {
         expiresAt: DateTime.utc(2026, 3, 8),
       );
       fakeService.storage['auth.token'] = expected.token;
-      fakeService.storage['auth.receivedAt'] = expected.receivedAt.toIso8601String();
-      fakeService.storage['auth.expiresAt'] = expected.expiresAt.toIso8601String();
+      fakeService.storage['auth.receivedAt'] = expected.receivedAt
+          .toIso8601String();
+      fakeService.storage['auth.expiresAt'] = expected.expiresAt
+          .toIso8601String();
 
       final result = await repository.getSession();
 
@@ -79,10 +101,12 @@ void main() {
     test('getValidToken returns token when session is not expired', () async {
       final now = DateTime.now().toUtc();
       fakeService.storage['auth.token'] = 'valid-token';
-      fakeService.storage['auth.receivedAt'] =
-          now.subtract(const Duration(minutes: 5)).toIso8601String();
-      fakeService.storage['auth.expiresAt'] =
-          now.add(const Duration(minutes: 5)).toIso8601String();
+      fakeService.storage['auth.receivedAt'] = now
+          .subtract(const Duration(minutes: 5))
+          .toIso8601String();
+      fakeService.storage['auth.expiresAt'] = now
+          .add(const Duration(minutes: 5))
+          .toIso8601String();
 
       final result = await repository.getValidToken();
 
@@ -92,10 +116,12 @@ void main() {
     test('getValidToken clears expired session', () async {
       final now = DateTime.now().toUtc();
       fakeService.storage['auth.token'] = 'expired-token';
-      fakeService.storage['auth.receivedAt'] =
-          now.subtract(const Duration(days: 2)).toIso8601String();
-      fakeService.storage['auth.expiresAt'] =
-          now.subtract(const Duration(days: 1)).toIso8601String();
+      fakeService.storage['auth.receivedAt'] = now
+          .subtract(const Duration(days: 2))
+          .toIso8601String();
+      fakeService.storage['auth.expiresAt'] = now
+          .subtract(const Duration(days: 1))
+          .toIso8601String();
 
       final result = await repository.getValidToken();
 
@@ -178,7 +204,10 @@ void main() {
 
       test('saveLastLoginMethod is a no-op for empty string', () async {
         await repository.saveLastLoginMethod('');
-        expect(fakeService.storage.containsKey('auth.lastLoginMethod'), isFalse);
+        expect(
+          fakeService.storage.containsKey('auth.lastLoginMethod'),
+          isFalse,
+        );
       });
 
       test('getLastLoginMethod returns saved value or null', () async {
@@ -212,7 +241,10 @@ void main() {
 
         await repository.clearLastLoginMethod();
 
-        expect(fakeService.storage.containsKey('auth.lastLoginMethod'), isFalse);
+        expect(
+          fakeService.storage.containsKey('auth.lastLoginMethod'),
+          isFalse,
+        );
       });
     });
   });

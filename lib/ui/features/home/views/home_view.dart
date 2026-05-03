@@ -1,41 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:zola/ui/features/contacts/views/screens/contacts_screen.dart';
-import 'package:zola/ui/features/discover/views/screens/discover_screen.dart';
-import 'package:zola/ui/features/messages/views/screens/messages_screen.dart';
-import 'package:zola/ui/features/personal/views/screens/personal_screen.dart';
-import 'package:zola/ui/features/wall/views/screens/wall_screen.dart';
+import 'package:go_router/go_router.dart';
 
-class HomeView extends StatefulWidget {
-  const HomeView({super.key});
+class HomeView extends StatelessWidget {
+  const HomeView({super.key, required this.navigationShell});
 
-  @override
-  State<HomeView> createState() => _HomeViewState();
-}
-
-class _HomeViewState extends State<HomeView> {
-  int _selectedIndex = 0;
+  final StatefulNavigationShell navigationShell;
 
   @override
   Widget build(BuildContext context) {
-    final pages = <Widget>[
-      const MessagesScreen(),
-      const ContactsScreen(),
-      const DiscoverScreen(),
-      const WallScreen(),
-      const PersonalScreen(),
-    ];
-
-    final safeIndex = _selectedIndex.clamp(0, pages.length - 1);
-
     return Scaffold(
-      body: IndexedStack(index: safeIndex, children: pages),
+      body: navigationShell,
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.shifting,
         selectedItemColor: Colors.lightBlue,
         unselectedItemColor: Colors.grey,
-        currentIndex: safeIndex,
-        onTap: (index) => setState(() => _selectedIndex = index),
-        items: <BottomNavigationBarItem>[
+        currentIndex: navigationShell.currentIndex,
+        onTap: (index) => navigationShell.goBranch(
+          index,
+          initialLocation: index == navigationShell.currentIndex,
+        ),
+        items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             backgroundColor: Colors.white,
             icon: Icon(Icons.chat_outlined),

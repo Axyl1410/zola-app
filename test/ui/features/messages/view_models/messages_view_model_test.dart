@@ -89,9 +89,7 @@ class _FakeAuthBackendRepository extends AuthBackendRepository {
 class _NoopAuthRemoteService extends AuthRemoteService {
   _NoopAuthRemoteService()
     : super(
-        apiClient: ApiClient(
-          authTokenProvider: _FakeAuthSessionRepository(),
-        ),
+        apiClient: ApiClient(authTokenProvider: _FakeAuthSessionRepository()),
       );
 
   @override

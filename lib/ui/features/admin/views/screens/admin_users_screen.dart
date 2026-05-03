@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:zola/domain/models/auth_user.dart';
 import 'package:zola/ui/features/admin/view_models/admin_users_view_model.dart';
 import 'package:zola/ui/features/auth/view_models/auth_status_providers.dart';
 import 'package:zola/ui/features/auth/view_models/auth_status_view_model.dart';
 import 'package:zola/ui/features/auth/view_models/current_user_provider.dart';
+import 'package:zola/ui/routing/app_routes.dart';
 
 class AdminUsersScreen extends ConsumerStatefulWidget {
   const AdminUsersScreen({super.key});
@@ -43,7 +45,7 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
               content: Text('Bạn không có quyền truy cập khu vực quản trị.'),
             ),
           );
-          Navigator.of(context).maybePop();
+          context.go(AppRoute.homePersonal);
           return;
         }
         break;
@@ -60,7 +62,7 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
             ),
           ),
         );
-        Navigator.of(context).maybePop();
+        context.go(AppRoute.homePersonal);
         return;
     }
     setState(() {
@@ -92,7 +94,7 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
         ),
         leading: IconButton(
           onPressed: () {
-            Navigator.pop(context);
+            context.go(AppRoute.admin);
           },
           icon: const Icon(Icons.arrow_back, color: Colors.white),
         ),

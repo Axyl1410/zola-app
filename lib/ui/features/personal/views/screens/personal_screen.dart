@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:zola/domain/models/auth_user.dart';
 import 'package:zola/ui/features/auth/view_models/auth_status_providers.dart';
 import 'package:zola/ui/features/auth/view_models/current_user_provider.dart';
-import 'package:zola/ui/features/admin/views/screens/admin_screen.dart';
-import 'package:zola/ui/features/settings/views/screens/settings_screen.dart';
+import 'package:zola/ui/routing/app_routes.dart';
 
 import 'package:zola/ui/core/widgets/default_home_app_bar.dart';
 
@@ -132,12 +132,7 @@ class PersonalScreen extends ConsumerWidget {
               const SizedBox(height: 16),
               ElevatedButton.icon(
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const AdminScreen(),
-                    ),
-                  );
+                  context.go(AppRoute.admin);
                 },
                 icon: const Icon(Icons.admin_panel_settings_outlined),
                 label: const Text('Trang quản trị'),
@@ -150,12 +145,7 @@ class PersonalScreen extends ConsumerWidget {
             const SizedBox(height: 16),
             ElevatedButton.icon(
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const SettingsScreen(),
-                  ),
-                );
+                context.go(AppRoute.settings);
               },
               icon: const Icon(Icons.settings),
               label: const Text('Cài đặt'),

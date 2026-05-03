@@ -27,8 +27,9 @@ void main() {
     await tester.tap(find.text('Kiểm tra lại phiên'));
     await tester.pump();
 
-    final notifier = container.read(authStatusNotifierProvider.notifier)
-        as _FakeAuthStatusNotifier;
+    final notifier =
+        container.read(authStatusNotifierProvider.notifier)
+            as _FakeAuthStatusNotifier;
     expect(notifier.refreshCalled, isTrue);
   });
 
@@ -53,8 +54,9 @@ void main() {
     await tester.tap(find.text('Đăng nhập lại'));
     await tester.pump();
 
-    final notifier = container.read(authStatusNotifierProvider.notifier)
-        as _FakeAuthStatusNotifier;
+    final notifier =
+        container.read(authStatusNotifierProvider.notifier)
+            as _FakeAuthStatusNotifier;
     expect(notifier.logoutCalled, isTrue);
     expect(notifier.lastNotifyBackend, isFalse);
   });

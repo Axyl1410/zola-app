@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:zola/ui/core/widgets/default_home_app_bar.dart';
-
-import 'full_screen_page.dart';
+import 'package:zola/ui/routing/app_routes.dart';
 
 class ContactsScreen extends StatelessWidget {
   const ContactsScreen({super.key});
@@ -20,9 +20,7 @@ class ContactsScreen extends StatelessWidget {
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const FullScreenPage()),
-                );
+                context.go(AppRoute.homeContactsFull);
               },
               child: const Text('Mở toàn màn hình'),
             ),

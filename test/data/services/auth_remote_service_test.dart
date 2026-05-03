@@ -9,9 +9,7 @@ void main() {
   group('AuthRemoteService', () {
     test('throws when backend base url is missing', () async {
       final service = AuthRemoteService(
-        apiClient: ApiClient(
-          authTokenProvider: _FakeAuthSessionRepository(),
-        ),
+        apiClient: ApiClient(authTokenProvider: _FakeAuthSessionRepository()),
       );
 
       await expectLater(

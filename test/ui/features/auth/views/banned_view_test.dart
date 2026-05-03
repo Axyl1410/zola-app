@@ -49,8 +49,9 @@ void main() {
     await tester.tap(find.text('Đăng xuất'));
     await tester.pumpAndSettle();
 
-    final notifier = container.read(authStatusNotifierProvider.notifier)
-        as _FakeAuthStatusNotifier;
+    final notifier =
+        container.read(authStatusNotifierProvider.notifier)
+            as _FakeAuthStatusNotifier;
     expect(notifier.logoutCalled, isTrue);
   });
 }
